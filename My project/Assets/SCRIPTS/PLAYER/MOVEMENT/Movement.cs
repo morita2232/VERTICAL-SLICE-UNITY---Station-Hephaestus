@@ -6,6 +6,9 @@ public class Movement : MonoBehaviour
     InputSystem_Actions inputs;
     public float speed;
     Camera cam;
+
+    public bool canMove = true;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -17,6 +20,9 @@ public class Movement : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (canMove)
+        {
+
         Vector2 dir = inputs.Player.Move.ReadValue<Vector2>();
 
                 transform.position +=
@@ -26,5 +32,6 @@ public class Movement : MonoBehaviour
         transform.position +=
             Vector3.ProjectOnPlane(cam.transform.right, Vector3.up).normalized
             * dir.x * speed * Time.fixedDeltaTime;
+        }
     }
 }

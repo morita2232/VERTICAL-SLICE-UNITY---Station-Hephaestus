@@ -8,6 +8,8 @@ public class RotacionVertical : MonoBehaviour
     public float minAngle = -80f;
     public float maxAngle = 80f;
 
+    public bool canRotate = true;
+
     private float currentRotationX;
 
     void Start()
@@ -18,6 +20,9 @@ public class RotacionVertical : MonoBehaviour
 
     void Update()
     {
+        if (canRotate)
+        {
+
         Vector2 look = inputs.Player.Look.ReadValue<Vector2>();
 
         // Invertir eje Y para comportamiento natural de cámara
@@ -25,5 +30,6 @@ public class RotacionVertical : MonoBehaviour
         currentRotationX = Mathf.Clamp(currentRotationX, minAngle, maxAngle);
 
         transform.localEulerAngles = new Vector3(currentRotationX, 0, 0);
+        }
     }
 }

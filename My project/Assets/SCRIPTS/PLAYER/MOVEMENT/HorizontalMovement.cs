@@ -12,6 +12,8 @@ public class HorizontalMovement : MonoBehaviour
 
     private Transform TransformY;
 
+    public bool canMove = true;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -22,6 +24,8 @@ public class HorizontalMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (canMove)
+        {
 
         Vector2 mouseDelta = Mouse.current.delta.value;
 
@@ -32,6 +36,7 @@ public class HorizontalMovement : MonoBehaviour
         Vector3 euler = TransformY.localEulerAngles;
         euler.y = RotationY;
         TransformY.localEulerAngles = euler;
+        }
 
     }
 }
