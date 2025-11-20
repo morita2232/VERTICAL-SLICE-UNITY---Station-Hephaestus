@@ -14,7 +14,6 @@ public class WireMGManager : MonoBehaviour
     public List<WireStart> wireStart;
     public List<WireEnd> wireEnd;
 
-
     private Dictionary<WireStart, WireEnd> pairings = new Dictionary<WireStart, WireEnd>();
 
     public float snapBufferPixels = 30f;
@@ -59,6 +58,14 @@ public class WireMGManager : MonoBehaviour
     {
         // If not in minigame, skip checks
         if (!playerInteractLocator.isInminigame) return;
+
+
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            EndMinigame();
+            return;
+        }
+
 
         // disable player controls while in minigame
         playerMovement.canMove = false;
@@ -115,14 +122,21 @@ public class WireMGManager : MonoBehaviour
 
         if (remaining == 0)
         {
-            // end minigame
-            playerInteractLocator.isInminigame = false;
-            playerMovement.canMove = true;
-            playerHorizontalMovement.canMove = true;
-            playerVerticalMovement.canRotate = true;
-            Cursor.lockState = CursorLockMode.Locked;
-            panelRoot.SetActive(false);
+            EndMinigame();
         }
+    }
+
+    // Centralized function to close the minigame (used for Q key and when completed)
+    private void EndMinigame()
+    {
+        playerInteractLocator.isInminigame = false;
+        playerMovement.canMove = true;
+        playerHorizontalMovement.canMove = true;
+        playerVerticalMovement.canRotate = true;
+        Cursor.lockState = CursorLockMode.Locked;
+        panelRoot.SetActive(false);
+
+        Debug.Log("Minigame closed.");
     }
 
     void AssignUniqueIdsForList<T>(List<T> list) where T : class
@@ -132,11 +146,11 @@ public class WireMGManager : MonoBehaviour
         int poolSize = availableColors.Count;
         int needed = Mathf.Min(list.Count, poolSize);
 
-        // Build id pool
+
         List<int> idPool = new List<int>(poolSize);
         for (int i = 0; i < poolSize; i++) idPool.Add(i);
 
-        // Shuffle
+
         for (int i = 0; i < idPool.Count; i++)
         {
             int j = Random.Range(i, idPool.Count);
@@ -145,7 +159,6 @@ public class WireMGManager : MonoBehaviour
             idPool[j] = tmp;
         }
 
-        // Assign to provided list via reflection
         for (int i = 0; i < needed; i++)
         {
             var element = list[i];
@@ -171,5 +184,6 @@ public class WireMGManager : MonoBehaviour
         }
     }
 }
+
 
 
