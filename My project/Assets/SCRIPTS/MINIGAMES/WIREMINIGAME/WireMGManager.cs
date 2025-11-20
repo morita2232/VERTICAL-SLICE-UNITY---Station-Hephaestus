@@ -14,10 +14,9 @@ public class WireMGManager : MonoBehaviour
     public List<WireStart> wireStart;
     public List<WireEnd> wireEnd;
 
-    // pairing: for each start, store its matching end
+
     private Dictionary<WireStart, WireEnd> pairings = new Dictionary<WireStart, WireEnd>();
 
-    // buffer in pixels for snapping/connection
     public float snapBufferPixels = 30f;
 
     void Start()
@@ -34,7 +33,7 @@ public class WireMGManager : MonoBehaviour
             return;
         }
 
-        // assign ids/colors (your existing method) - keep as is
+        // assign ids/colors
         AssignUniqueIdsForList(wireStart);
         AssignUniqueIdsForList(wireEnd);
 
@@ -126,7 +125,6 @@ public class WireMGManager : MonoBehaviour
         }
     }
 
-    // --- keep your existing AssignUniqueIdsForList<T> implementation here ---
     void AssignUniqueIdsForList<T>(List<T> list) where T : class
     {
         if (list == null || list.Count == 0) return;
@@ -147,7 +145,7 @@ public class WireMGManager : MonoBehaviour
             idPool[j] = tmp;
         }
 
-        // Assign to provided list via reflection (keeps compatibility)
+        // Assign to provided list via reflection
         for (int i = 0; i < needed; i++)
         {
             var element = list[i];

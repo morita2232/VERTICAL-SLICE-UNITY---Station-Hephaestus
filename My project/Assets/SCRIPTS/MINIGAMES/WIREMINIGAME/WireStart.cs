@@ -28,7 +28,7 @@ public class WireStart : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         // store screen position for manager checks
         screenPos = eventData.position;
 
-        // move the visual. For screen-space canvases this is fine:
+        // move the visual.
         if (parentCanvas != null && parentCanvas.renderMode != RenderMode.WorldSpace)
         {
             transform.position = screenPos;
