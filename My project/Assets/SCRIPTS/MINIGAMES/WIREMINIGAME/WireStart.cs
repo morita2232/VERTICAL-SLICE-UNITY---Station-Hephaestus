@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -8,8 +7,9 @@ public class WireStart : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public int id;
     public Image img;
 
-    // current pointer/screen position of this start (updated while dragging)
     [HideInInspector] public Vector2 screenPos;
+    [HideInInspector] public Vector3 initialPosition;
+    [HideInInspector] public bool hasInitialPosition = false;
 
     Canvas parentCanvas;
 
@@ -17,25 +17,37 @@ public class WireStart : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     {
         img = GetComponent<Image>();
         parentCanvas = GetComponentInParent<Canvas>();
+
     }
 
-    public void OnPointerEnter(PointerEventData eventData) { /* optional debug */ }
-    public void OnPointerExit(PointerEventData eventData) { /* optional debug */ }
+    // --- NEW: called by manager when starting a puzzle ---
+    public void ResetState()
+    {
+        // first time we reset, remember where the layout put us
+        if (!hasInitialPosition)
+        {
+            initialPosition = transform.position;
+            hasInitialPosition = true;
+        }
 
-    // called during drag — update screenPos and move the UI element
+        screenPos = Vector2.zero;
+        transform.position = initialPosition;
+    }
+    // -----------------------------------------------------
+
+    public void OnPointerEnter(PointerEventData eventData) { }
+    public void OnPointerExit(PointerEventData eventData) { }
+
     public void OnDrag(PointerEventData eventData)
     {
-        // store screen position for manager checks
         screenPos = eventData.position;
 
-        // move the visual.
         if (parentCanvas != null && parentCanvas.renderMode != RenderMode.WorldSpace)
         {
             transform.position = screenPos;
         }
         else
         {
-            // convert for camera/world canvases
             RectTransformUtility.ScreenPointToWorldPointInRectangle(
                 parentCanvas != null ? (parentCanvas.transform as RectTransform) : null,
                 screenPos,
@@ -46,5 +58,7 @@ public class WireStart : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         }
     }
 }
+
+
 
 
