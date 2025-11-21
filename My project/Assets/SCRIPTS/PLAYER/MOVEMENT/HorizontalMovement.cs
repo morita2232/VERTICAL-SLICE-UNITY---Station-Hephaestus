@@ -3,16 +3,17 @@ using UnityEngine.InputSystem;
 
 public class HorizontalMovement : MonoBehaviour
 {
+    [Header("References")]
     public GameObject player;
 
+    [Header("Attributes")]
     public float minBaseY = -60f;
     public float maxBaseY = 60f;
+    public bool canMove = true;
 
     private float RotationY = 0f;
-
     private Transform TransformY;
 
-    public bool canMove = true;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

@@ -2,7 +2,10 @@ using UnityEngine;
 
 public class WireComputer : MonoBehaviour
 {
-    public WireMGManager wireManager;   // drag your single manager here in the Inspector
+    [Header("Script references")]
+    public WireMGManager wireManager; 
+        
+    [Header("Object attributes")]
     public bool completed;
 
     // called when player presses E on this computer
@@ -22,7 +25,6 @@ public class WireComputer : MonoBehaviour
         completed = true;
         Debug.Log(name + ": puzzle completed!");
 
-        // here you can change material, turn on a light, etc.
     }
 }
 

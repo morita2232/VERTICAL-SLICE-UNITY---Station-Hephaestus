@@ -3,9 +3,11 @@ using UnityEngine.InputSystem;
 
 public class CameraController : MonoBehaviour
 {
-
+    [Header("References")]
     InputSystem_Actions inputs;
     public Transform pivot;
+
+    [Header("Attributes")]
     public float sensitivity;
     public float distance = 5;
     public float minY;

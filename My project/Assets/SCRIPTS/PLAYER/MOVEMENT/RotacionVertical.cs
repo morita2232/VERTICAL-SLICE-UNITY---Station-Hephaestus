@@ -3,13 +3,13 @@ using UnityEngine.InputSystem;
 
 public class RotacionVertical : MonoBehaviour
 {
-    InputSystem_Actions inputs;
+    [Header("Attributes")]
     public float speed = 0.2f;
     public float minAngle = -80f;
     public float maxAngle = 80f;
-
     public bool canRotate = true;
-
+    
+    InputSystem_Actions inputs;
     private float currentRotationX;
 
     void Start()

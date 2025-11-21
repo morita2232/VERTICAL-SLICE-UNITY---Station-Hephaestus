@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class GroundDetection : MonoBehaviour
 {
-
+    [Header("Attributes")]
     public Vector3 offset;
     public float radius;
     public float distance;

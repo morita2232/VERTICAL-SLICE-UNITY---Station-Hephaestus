@@ -4,14 +4,16 @@ using UnityEngine.UI;
 
 public class WireStart : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IDragHandler
 {
+    [Header("Attributes")]
     public int id;
     public Image img;
+    Canvas parentCanvas;
+
 
     [HideInInspector] public Vector2 screenPos;
     [HideInInspector] public Vector3 initialPosition;
     [HideInInspector] public bool hasInitialPosition = false;
 
-    Canvas parentCanvas;
 
     void Awake()
     {
@@ -20,10 +22,10 @@ public class WireStart : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
 
     }
 
-    // --- NEW: called by manager when starting a puzzle ---
+    // --- called by manager when starting a puzzle ---
     public void ResetState()
     {
-        // first time we reset, remember where the layout put us
+
         if (!hasInitialPosition)
         {
             initialPosition = transform.position;

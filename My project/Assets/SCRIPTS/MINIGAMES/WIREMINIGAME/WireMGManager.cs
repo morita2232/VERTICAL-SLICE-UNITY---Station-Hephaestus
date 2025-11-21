@@ -3,19 +3,22 @@ using UnityEngine;
 
 public class WireMGManager : MonoBehaviour
 {
+    [Header("Display attributes")]
     public GameObject panelRoot;
     public List<Color> availableColors;
+    public float snapBufferPixels = 30f;
 
+    [Header("Script references")]
     public InteractLocator playerInteractLocator;
-    public Movement playerMovement;
     public HorizontalMovement playerHorizontalMovement;
+    public Movement playerMovement;
     public RotacionVertical playerVerticalMovement;
 
+    [Header("Wire lists")]
     public List<WireStart> wireStart;
     public List<WireEnd> wireEnd;
 
     private Dictionary<WireStart, WireEnd> pairings = new Dictionary<WireStart, WireEnd>();
-    public float snapBufferPixels = 30f;
 
     // which computer is currently using the minigame
     private WireComputer currentOwner;

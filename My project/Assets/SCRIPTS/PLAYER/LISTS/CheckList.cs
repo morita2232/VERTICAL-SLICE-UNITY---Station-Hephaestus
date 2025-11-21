@@ -4,7 +4,7 @@ public class CheckList : MonoBehaviour
 {
     private WireComputer[] wireComputers;
 
-    // position & size of the checklist box on screen
+    [Header("Attributes")]
     public Vector2 uiOffset = new Vector2(10f, 10f);
     public Vector2 uiSize = new Vector2(250f, 200f);
 

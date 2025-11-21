@@ -2,12 +2,13 @@ using UnityEngine;
 
 public class Interactable : MonoBehaviour
 {
+    [Header("Pop up attributes")]
     public GameObject interactPopUp;
-
     public Vector3 offsetFromCamera = new Vector3(0, 1f, 2.5f); // adjustable offset
-
     private Transform cam;
 
+
+    [Header("Script references")]
     public InteractLocator interactLocator;
 
     private void Start()

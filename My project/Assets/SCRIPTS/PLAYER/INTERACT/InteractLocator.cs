@@ -2,17 +2,20 @@ using UnityEngine;
 
 public class InteractLocator : MonoBehaviour
 {
+    [Header("Attributes")]
     public LayerMask interactMask;
-    public GameObject miniGame;   // you can ignore / remove this if WireMGManager handles UI
+    public bool isInminigame = false;
+    public bool canInteract = false;
+    public bool isInSpaceShip = false;
+    
+    [Header("References")]
+    public GameObject miniGame;
+    public GameObject player;
+    public Transform spaceshipSpawn;
 
     private Camera mainCamera;
     private InputSystem_Actions inputs;
     private bool clicked;
-    public bool isInminigame = false;
-    public bool canInteract = false;
-    public GameObject player;
-    public Transform spaceshipSpawn;
-    public bool isInSpaceShip = false;
 
     void Start()
     {
@@ -23,7 +26,7 @@ public class InteractLocator : MonoBehaviour
 
     void Update()
     {
-        // your interact button (F or whatever you mapped)
+
         clicked = inputs.Player.Interact.ReadValue<float>() > 0;
 
         Debug.Log("Clicked: " + clicked);
@@ -47,9 +50,16 @@ public class InteractLocator : MonoBehaviour
                 if (isMinigameObject)
                 {
                     var wireComp = hit.collider.GetComponent<WireComputer>();
+                    var balanceComp = hit.collider.GetComponent<BallBalanceObject>();
+
                     if (wireComp != null)
                     {
                         wireComp.Interact();   // this calls WireMGManager.OpenForComputer(...)
+                    }
+
+                    if(balanceComp != null)
+                    {
+                        balanceComp.Interact();
                     }
                 }
 

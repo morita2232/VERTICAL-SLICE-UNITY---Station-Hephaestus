@@ -4,9 +4,13 @@ using UnityEngine.UI;
 
 public class WireEnd : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
+    [Header ("Attributes")]
     public int id;
 
     public Image img;
+
+
+    [Header ("Is it connected to a wire start")]
     public bool connected = false;
 
  
@@ -15,17 +19,7 @@ public class WireEnd : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         img = GetComponent<Image>();
 
     }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     public void OnPointerEnter(PointerEventData eventData)
     {
         Debug.Log("Mouse entered " + gameObject.name);
