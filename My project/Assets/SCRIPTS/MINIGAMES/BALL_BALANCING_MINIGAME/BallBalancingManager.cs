@@ -6,6 +6,9 @@ public class BallBalancingManager : MonoBehaviour
     private BallBalanceObject currentOwner;
     public GameObject mainCam;
     public GameObject mingameCam;
+    public GameObject ballPrefab;
+    public Transform ballSpawnPoint;
+    public PlaneMovement planeMovementScript;
 
     public void OpenForObject(BallBalanceObject owner)
     {
@@ -16,6 +19,10 @@ public class BallBalancingManager : MonoBehaviour
 
         mingameCam.SetActive(true);
         mainCam.SetActive(false);
+
+        Instantiate(ballPrefab, ballSpawnPoint.position, Quaternion.identity);
+
+        planeMovementScript.movePlane = true;
 
     }
 
