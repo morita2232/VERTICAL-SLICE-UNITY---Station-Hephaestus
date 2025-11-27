@@ -3,6 +3,7 @@ using UnityEngine;
 public class CheckList : MonoBehaviour
 {
     private WireComputer[] wireComputers;
+    private BallBalanceObject[] balanceObjects;
 
     [Header("Attributes")]
     public Vector2 uiOffset = new Vector2(10f, 10f);
@@ -11,6 +12,7 @@ public class CheckList : MonoBehaviour
     void Awake()
     {
         wireComputers = FindObjectsByType<WireComputer>(FindObjectsSortMode.None);
+        balanceObjects = FindObjectsByType<BallBalanceObject>(FindObjectsSortMode.None);
     }
 
 
@@ -34,6 +36,20 @@ public class CheckList : MonoBehaviour
                 {
                     remaining++;
                     GUILayout.Label("• Fix " + comp.gameObject.name);
+                }
+            }
+        }
+
+        if (balanceObjects != null)
+        {
+            foreach (var obj in balanceObjects)
+            {
+                if (obj == null) continue;
+
+                if (!obj.completed)
+                {
+                    remaining++;
+                    GUILayout.Label("• Fix " + obj.gameObject.name);
                 }
             }
         }

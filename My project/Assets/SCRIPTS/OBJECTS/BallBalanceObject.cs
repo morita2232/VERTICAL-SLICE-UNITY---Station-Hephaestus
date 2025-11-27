@@ -10,11 +10,20 @@ public class BallBalanceObject : MonoBehaviour
 
     public void Interact()
     {
-
-
-        Debug.Log("Se activo el juego guarra");
+        if (completed)
+        {
+            Debug.Log(name + ": already completed.");
+            return;
+        }
 
         manager.OpenForObject(this);
+
+    }
+
+    public void MarkCompleted()
+    {
+        completed = true;
+        Debug.Log(name + ": puzzle completed!");
 
     }
 }
