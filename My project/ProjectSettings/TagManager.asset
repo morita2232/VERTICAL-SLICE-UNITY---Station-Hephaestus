@@ -8,6 +8,7 @@ TagManager:
   - Miniggame
   - SpaceShip
   - Ball
+  - Mop
   layers:
   - Default
   - TransparentFX

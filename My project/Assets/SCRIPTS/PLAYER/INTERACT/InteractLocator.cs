@@ -29,8 +29,6 @@ public class InteractLocator : MonoBehaviour
 
         clicked = inputs.Player.Interact.ReadValue<float>() > 0;
 
-        Debug.Log("Clicked: " + clicked);
-
         Ray ray = mainCamera.ScreenPointToRay(
             new Vector3(Screen.width / 2, Screen.height / 2, 0));
         RaycastHit hit;
@@ -42,11 +40,12 @@ public class InteractLocator : MonoBehaviour
 
             bool isMinigameObject = hit.collider.CompareTag("Miniggame");
             bool isSpaceShipObject = hit.collider.CompareTag("SpaceShip");
+            bool isMopObject = hit.collider.CompareTag("Mop");
 
             // Only DO things when the interact button is actually pressed
             if (clicked)
             {
-                // ---- WIRE MINIGAME ----
+                // ---- MINIGAME ----
                 if (isMinigameObject)
                 {
                     var wireComp = hit.collider.GetComponent<WireComputer>();
@@ -69,6 +68,11 @@ public class InteractLocator : MonoBehaviour
                     Debug.Log("Entering spaceship...");
                     player.transform.position = spaceshipSpawn.position;
                     isInSpaceShip = true;
+                }
+
+                if (isMopObject)
+                {
+                    Debug.Log("A limpiar guarrilla");
                 }
             }
         }

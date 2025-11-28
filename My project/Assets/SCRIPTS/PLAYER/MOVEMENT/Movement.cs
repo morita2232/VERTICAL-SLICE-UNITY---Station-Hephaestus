@@ -1,39 +1,49 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(Rigidbody))]
 public class Movement : MonoBehaviour
 {
     [Header("Attributes")]
     public bool canMove = true;
-    public float speed;
+    public float speed = 5f;
 
     InputSystem_Actions inputs;
+    Rigidbody rb;
     Camera cam;
 
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void Awake()
     {
         inputs = new InputSystem_Actions();
-        inputs.Enable();
+        rb = GetComponent<Rigidbody>();
         cam = Camera.main;
+
+        rb.freezeRotation = true;
     }
 
-    // Update is called once per frame
+    void OnEnable() => inputs.Enable();
+    void OnDisable() => inputs.Disable();
+
     void FixedUpdate()
     {
-        if (canMove)
-        {
+        if (!canMove) return;
 
-            Vector2 dir = inputs.Player.Move.ReadValue<Vector2>();
+        Vector2 dir = inputs.Player.Move.ReadValue<Vector2>();
 
-                transform.position +=
-                    Vector3.ProjectOnPlane(cam.transform.forward, Vector3.up).normalized
-                    * dir.y * speed * Time.fixedDeltaTime;
+        // Flat camera directions
+        Vector3 forward = new Vector3(cam.transform.forward.x, 0, cam.transform.forward.z).normalized;
+        Vector3 right = new Vector3(cam.transform.right.x, 0, cam.transform.right.z).normalized;
 
-                transform.position +=
-                    Vector3.ProjectOnPlane(cam.transform.right, Vector3.up).normalized
-                    * dir.x * speed * Time.fixedDeltaTime;
-        }
+        Vector3 move = (forward * dir.y + right * dir.x) * speed * Time.fixedDeltaTime;
+        rb.MovePosition(rb.position + move);
+
+        //  Force the player to stay upright
+        Vector3 rot = transform.rotation.eulerAngles;
+        transform.rotation = Quaternion.Euler(0f, rot.y, rot.z);
     }
 }
+
+
+
+
+
