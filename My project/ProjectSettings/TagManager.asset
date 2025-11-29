@@ -9,6 +9,7 @@ TagManager:
   - SpaceShip
   - Ball
   - Mop
+  - Dirt
   layers:
   - Default
   - TransparentFX
@@ -17,7 +18,7 @@ TagManager:
   - Water
   - UI
   - Interactable
-  - 
+  - Dirt
   - 
   - 
   - 

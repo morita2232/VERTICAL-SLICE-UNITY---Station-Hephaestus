@@ -72,6 +72,8 @@ public class InteractLocator : MonoBehaviour
 
                 if (isMopObject)
                 {
+                    var mopComp = hit.collider.GetComponent<Mop>();
+                    mopComp.PickUp();
                     Debug.Log("A limpiar guarrilla");
                 }
             }
