@@ -2,33 +2,142 @@ using UnityEngine;
 
 public class ConduitManager : MonoBehaviour
 {
+    private ConduitObject currentOwner;
+
+    [Header("Cameras / Player")]
+    public InteractLocator playerInteractLocator;
+
+    public HorizontalMovement playerHorizontalMovement;
+    public Movement playerMovement;
+    public RotacionVertical playerVerticalMovement;
+
+    [Header("Conduit Puzzle")]
     public ConduitTube[] tubes;
-    public KeyCode lockKey = KeyCode.E;  // "charge" key
+
+    [Header("Input")]
+    public KeyCode startKey = KeyCode.E;
+    public KeyCode prevTubeKey = KeyCode.A; 
+    public KeyCode nextTubeKey = KeyCode.D;
+    public KeyCode exitKey = KeyCode.Q; 
+
     public bool solved { get; private set; }
 
-    void Update()
-    {
-        if (solved) return;
+    int activeIndex = 0;
+    bool puzzleStarted = false;
+    bool isMinigameOpen = false;
 
-        // press E: all tubes start charging from zero
-        if (Input.GetKeyDown(lockKey))
+    public void OpenForObject(ConduitObject owner)
+    {
+        currentOwner = owner;
+
+        Debug.Log("Conduit minigame opened for " + owner.gameObject.name);
+
+        solved = false;
+        puzzleStarted = false;
+        activeIndex = 0;
+
+        if (tubes != null)
         {
-            foreach (var t in tubes)
+            for (int i = 0; i < tubes.Length; i++)
             {
-                if (t == null) continue;
-                t.StartCharge();
+                if (tubes[i] == null) continue;
+                tubes[i].ResetTube();
             }
         }
 
+        SetActiveTube(activeIndex, false);
+
+        if (playerInteractLocator != null)
+            playerInteractLocator.isInminigame = true;
+
+        if (playerMovement != null) playerMovement.canMove = false;
+        if (playerHorizontalMovement != null) playerHorizontalMovement.canMove = false;
+        if (playerVerticalMovement != null) playerVerticalMovement.canRotate = false;
+
+        isMinigameOpen = true;
+    }
+
+    void Update()
+    {
+        if (!isMinigameOpen) return;
+
+        if (Input.GetKeyDown(exitKey))
+        {
+            EndMinigame();
+            return;
+        }
+
+        if (solved) return;
+
+        HandlePuzzleInput();
         CheckSolved();
+    }
+
+    void HandlePuzzleInput()
+    {
+        if (!puzzleStarted)
+        {
+            if (Input.GetKeyDown(startKey))
+            {
+                puzzleStarted = true;
+                SetActiveTube(activeIndex, true);
+            }
+            return;
+        }
+
+        int newIndex = activeIndex;
+
+        if (Input.GetKeyDown(nextTubeKey))
+        {
+            newIndex = (activeIndex + 1) % tubes.Length;
+        }
+        else if (Input.GetKeyDown(prevTubeKey))
+        {
+            newIndex = (activeIndex - 1 + tubes.Length) % tubes.Length;
+        }
+
+        if (newIndex != activeIndex)
+        {
+            SwitchActiveTube(newIndex);
+        }
+    }
+
+    void SwitchActiveTube(int newIndex)
+    {
+        if (tubes == null || tubes.Length == 0) return;
+
+        if (tubes[activeIndex] != null)
+            tubes[activeIndex].SetActive(false);
+
+        activeIndex = newIndex;
+
+        if (tubes[activeIndex] != null)
+            tubes[activeIndex].SetActive(true);
+    }
+
+    void SetActiveTube(int index, bool shouldCharge)
+    {
+        if (tubes == null || tubes.Length == 0) return;
+
+        activeIndex = Mathf.Clamp(index, 0, tubes.Length - 1);
+
+        for (int i = 0; i < tubes.Length; i++)
+        {
+            if (tubes[i] == null) continue;
+
+            bool isThisActive = (i == activeIndex) && shouldCharge;
+            tubes[i].SetActive(isThisActive);
+        }
     }
 
     void CheckSolved()
     {
+        if (tubes == null || tubes.Length == 0) return;
+
         foreach (var t in tubes)
         {
             if (t == null) return;
-            if (!t.isLocked) return;   // all must have succeeded
+            if (!t.InTarget) return;
         }
 
         solved = true;
@@ -38,6 +147,38 @@ public class ConduitManager : MonoBehaviour
     void OnSolved()
     {
         Debug.Log("Conduit puzzle solved!");
-        // open door, enable power, etc.
+
+        if (currentOwner != null)
+            currentOwner.MarkCompleted();
+
+        EndMinigame();
+    }
+
+    void EndMinigame()
+    {
+        isMinigameOpen = false;
+
+      
+        if (tubes != null)
+        {
+            foreach (var t in tubes)
+            {
+                if (t == null) continue;
+                t.SetActive(false);
+            }
+        }
+
+        if (playerInteractLocator != null)
+            playerInteractLocator.isInminigame = false;
+
+        if (playerMovement != null) playerMovement.canMove = true;
+        if (playerHorizontalMovement != null) playerHorizontalMovement.canMove = true;
+        if (playerVerticalMovement != null) playerVerticalMovement.canRotate = true;
+
+        Cursor.lockState = CursorLockMode.Locked;
+
+        Debug.Log("Conduit minigame closed.");
     }
 }
+
+

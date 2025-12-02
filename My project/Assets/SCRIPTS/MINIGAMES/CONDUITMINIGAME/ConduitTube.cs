@@ -4,16 +4,16 @@ using UnityEngine;
 public class ConduitTube : MonoBehaviour
 {
     [Header("Charge Settings")]
-    public float chargeSpeed = 0.5f;       // how fast the fill rises
-    public Vector2 targetRange = new Vector2(0.3f, 0.7f); // random range bounds
+    public float chargeSpeed = 0.5f;   // how fast it fills when active
+    public float drainSpeed = 0.2f;    // how fast it drains when inactive
+    public Vector2 targetRange = new Vector2(0.3f, 0.7f); // where red zone can spawn
 
     [Header("Debug (read-only)")]
     [Range(0f, 1f)] public float targetMin;
     [Range(0f, 1f)] public float targetMax;
     [Range(0f, 1f)] public float currentFill;
 
-    public bool isLocked { get; private set; }
-    public bool isCharging { get; private set; }
+    public bool isActive { get; private set; }
 
     Renderer rend;
     Material matInstance;
@@ -26,83 +26,61 @@ public class ConduitTube : MonoBehaviour
         rend = GetComponent<Renderer>();
         matInstance = rend.material;
 
-        // pick a random target window within targetRange
+        // random red zone within the allowed range
         float center = Random.Range(targetRange.x, targetRange.y);
-        float halfSize = 0.05f; // thickness of red zone
+        float halfSize = 0.05f;
         targetMin = Mathf.Clamp01(center - halfSize);
         targetMax = Mathf.Clamp01(center + halfSize);
 
-        // push to material
         matInstance.SetFloat("_TargetMin", targetMin);
         matInstance.SetFloat("_TargetMax", targetMax);
 
         currentFill = 0f;
         matInstance.SetFloat("_Fill", currentFill);
+
+        // default fill color
+        matInstance.SetColor("_FillColor", Color.cyan);
     }
 
     void Update()
     {
-        if (!isCharging || isLocked)
-            return;
+        float dt = Time.deltaTime;
 
-        // grow the fill upward
-        currentFill += chargeSpeed * Time.deltaTime;
-        currentFill = Mathf.Clamp01(currentFill);
+        if (isActive)
+        {
+            // grow up
+            currentFill += chargeSpeed * dt;
+            currentFill = Mathf.Clamp01(currentFill);
+        }
+        else
+        {
+            // drain down
+            if (currentFill > 0f)
+            {
+                currentFill -= drainSpeed * dt;
+                if (currentFill < 0f) currentFill = 0f;
+            }
+        }
 
         matInstance.SetFloat("_Fill", currentFill);
 
-        // success: we enter the red zone
         if (InTarget)
-        {
-            LockSuccess();
-        }
-        // failure: we reached the top and never passed through the red zone
-        else if (currentFill >= 1f)
-        {
-            FailAndReset();
-        }
+            matInstance.SetColor("_FillColor", Color.green);
+        else
+            matInstance.SetColor("_FillColor", Color.cyan);
     }
 
-    public void StartCharge()
+    public void SetActive(bool value)
     {
-        if (isLocked) return; // already solved
-
-        isCharging = true;
-        currentFill = 0f;
-        matInstance.SetFloat("_Fill", currentFill);
-
-        // make fill blue/green at start
-        matInstance.SetColor("_FillColor", Color.cyan);
-    }
-
-    void LockSuccess()
-    {
-        isLocked = true;
-        isCharging = false;
-
-        // set fill to the middle of the red zone
-        currentFill = (targetMin + targetMax) * 0.5f;
-        matInstance.SetFloat("_Fill", currentFill);
-
-        // turn fill green to show success
-        matInstance.SetColor("_FillColor", Color.green);
-    }
-
-    void FailAndReset()
-    {
-        isCharging = false;
-        currentFill = 0f;
-        matInstance.SetFloat("_Fill", currentFill);
-
-        // optional: flash red, play error sound, etc.
-        // matInstance.SetColor("_FillColor", Color.red);
+        isActive = value;
     }
 
     public void ResetTube()
     {
-        isLocked = false;
-        isCharging = false;
+        isActive = false;
         currentFill = 0f;
         matInstance.SetFloat("_Fill", currentFill);
+        matInstance.SetColor("_FillColor", Color.cyan);
     }
 }
+

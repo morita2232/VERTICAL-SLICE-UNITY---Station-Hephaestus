@@ -7,6 +7,7 @@ public class MopCleaner : MonoBehaviour
     public float minScaleToDestroy = 0.1f;  // destroy when smaller than this
     public float minMoveSpeed = 0.1f;       // how fast the mop must move to clean
 
+    public CheckList checklist; // assign Checklist in inspector
     private Vector3 lastPosition;
     private float currentSpeed;
 
@@ -44,6 +45,8 @@ public class MopCleaner : MonoBehaviour
         float maxAxis = Mathf.Max(scale.x, Mathf.Max(scale.y, scale.z));
         if (maxAxis <= minScaleToDestroy)
         {
+            checklist.allDirt--;
+            checklist.remaining--;
             Destroy(dirt.gameObject);
             return;
         }

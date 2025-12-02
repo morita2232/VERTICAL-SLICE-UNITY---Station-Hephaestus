@@ -50,6 +50,7 @@ public class InteractLocator : MonoBehaviour
                 {
                     var wireComp = hit.collider.GetComponent<WireComputer>();
                     var balanceComp = hit.collider.GetComponent<BallBalanceObject>();
+                    var conduitComp = hit.collider.GetComponent<ConduitObject>();
 
                     if (wireComp != null)
                     {
@@ -60,6 +61,12 @@ public class InteractLocator : MonoBehaviour
                     {
                         balanceComp.Interact();
                     }
+
+                    if(conduitComp != null)
+                    {
+                        conduitComp.Interact();
+                    }
+
                 }
 
                 // ---- SPACESHIP ----

@@ -4,6 +4,11 @@ public class CheckList : MonoBehaviour
 {
     private WireComputer[] wireComputers;
     private BallBalanceObject[] balanceObjects;
+    private ConduitObject[] conduitObjects;
+    private GameObject[] dirt;
+
+    public int allDirt = 0;
+    public int remaining = 0;
 
     [Header("Attributes")]
     public Vector2 uiOffset = new Vector2(10f, 10f);
@@ -13,19 +18,22 @@ public class CheckList : MonoBehaviour
     {
         wireComputers = FindObjectsByType<WireComputer>(FindObjectsSortMode.None);
         balanceObjects = FindObjectsByType<BallBalanceObject>(FindObjectsSortMode.None);
+        conduitObjects = FindObjectsByType<ConduitObject>(FindObjectsSortMode.None);
+        dirt = GameObject.FindGameObjectsWithTag("Dirt");
     }
-
 
     void OnGUI()
     {
-        // draw a simple box
+        // IMPORTANT: reset counters each draw
+        remaining = 0;
+        allDirt = 0;
+
         Rect area = new Rect(uiOffset.x, uiOffset.y, uiSize.x, uiSize.y);
         GUILayout.BeginArea(area, GUI.skin.box);
 
         GUILayout.Label("Checklist");
 
-        int remaining = 0;
-
+        // Wire computers
         if (wireComputers != null)
         {
             foreach (var comp in wireComputers)
@@ -40,6 +48,7 @@ public class CheckList : MonoBehaviour
             }
         }
 
+        // Ball balance objects
         if (balanceObjects != null)
         {
             foreach (var obj in balanceObjects)
@@ -54,19 +63,52 @@ public class CheckList : MonoBehaviour
             }
         }
 
+        // Conduit objects
+        if (conduitObjects != null)
+        {
+            foreach (var obj in conduitObjects)
+            {
+                if (obj == null) continue;
+
+                if (!obj.completed)
+                {
+                    remaining++;
+                    GUILayout.Label("• Fix " + obj.gameObject.name);
+                }
+            }
+        }
+
+        // Dirt
+        if (dirt != null)
+        {
+            foreach (var obj in dirt)
+            {
+                if (obj == null) continue;
+
+                if (obj.activeSelf)
+                {
+                    allDirt++;
+                    remaining++;
+                }
+            }
+            if (allDirt > 0)
+            {
+                 GUILayout.Label("• Clean " + allDirt);
+
+            }
+        }
+
+        // Summary
+        GUILayout.Space(5);
+
         if (remaining == 0)
-        {
-            GUILayout.Space(5);
             GUILayout.Label("All tasks complete!");
-        }
         else
-        {
-            GUILayout.Space(5);
             GUILayout.Label("Remaining: " + remaining);
-        }
 
         GUILayout.EndArea();
     }
 }
+
 
 

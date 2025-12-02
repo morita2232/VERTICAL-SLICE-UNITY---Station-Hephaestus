@@ -623,7 +623,7 @@ GameObject:
   m_Component:
   - component: {fileID: 132265696}
   - component: {fileID: 132265697}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: GameObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -657,11 +657,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0e2da6d165760f4e94d4bc2b1775866, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerInteractLocator: {fileID: 330585550}
+  playerHorizontalMovement: {fileID: 169577838}
+  playerMovement: {fileID: 169577839}
+  playerVerticalMovement: {fileID: 330585548}
   tubes:
   - {fileID: 1709739727}
   - {fileID: 789629724}
   - {fileID: 1269786166}
-  lockKey: 101
+  startKey: 101
+  prevTubeKey: 97
+  nextTubeKey: 100
+  exitKey: 113
 --- !u!1 &146576931
 GameObject:
   m_ObjectHideFlags: 0
@@ -4968,7 +4975,7 @@ GameObject:
   - component: {fileID: 789629722}
   - component: {fileID: 789629721}
   - component: {fileID: 789629724}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cylinder (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5078,11 +5085,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a37508a53c1173442bc799cf33e3f370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chargeSpeed: 0.5
+  chargeSpeed: 0.3
+  drainSpeed: 0.1
   targetRange: {x: 0.3, y: 0.7}
   targetMin: 0.4
   targetMax: 0.6
   currentFill: 0
+--- !u!1 &796743155 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 1c78bd33e47c4b74abaffa2ef3708854, type: 3}
+  m_PrefabInstance: {fileID: 1986239025}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &796893535
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5797,6 +5810,7 @@ MonoBehaviour:
   shrinkRate: 0.1
   minScaleToDestroy: 0.1
   minMoveSpeed: 0.1
+  checklist: {fileID: 1207082819}
 --- !u!54 &869329786
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -7848,6 +7862,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0f8d54f33b9fc1408af4f5ad258785f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  allDirt: 0
+  remaining: 0
   uiOffset: {x: 10, y: 10}
   uiSize: {x: 250, y: 200}
 --- !u!4 &1207082820
@@ -8146,7 +8162,7 @@ GameObject:
   - component: {fileID: 1269786164}
   - component: {fileID: 1269786163}
   - component: {fileID: 1269786166}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cylinder (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8256,7 +8272,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a37508a53c1173442bc799cf33e3f370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chargeSpeed: 0.5
+  chargeSpeed: 0.3
+  drainSpeed: 0.1
   targetRange: {x: 0.3, y: 0.7}
   targetMin: 0.4
   targetMax: 0.6
@@ -10673,7 +10690,7 @@ GameObject:
   - component: {fileID: 1709739725}
   - component: {fileID: 1709739724}
   - component: {fileID: 1709739727}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10783,7 +10800,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a37508a53c1173442bc799cf33e3f370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chargeSpeed: 0.5
+  chargeSpeed: 0.3
+  drainSpeed: 0.1
   targetRange: {x: 0.3, y: 0.7}
   targetMin: 0.4
   targetMax: 0.6
@@ -12613,6 +12631,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: computer-system
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 1c78bd33e47c4b74abaffa2ef3708854, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 1c78bd33e47c4b74abaffa2ef3708854, type: 3}
+      propertyPath: m_TagString
+      value: Miniggame
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -12628,13 +12654,72 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 1c78bd33e47c4b74abaffa2ef3708854, type: 3}
       insertIndex: -1
       addedObject: {fileID: 132265696}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1c78bd33e47c4b74abaffa2ef3708854, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1986239029}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1c78bd33e47c4b74abaffa2ef3708854, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1986239030}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1c78bd33e47c4b74abaffa2ef3708854, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1986239031}
   m_SourcePrefab: {fileID: 100100000, guid: 1c78bd33e47c4b74abaffa2ef3708854, type: 3}
 --- !u!4 &1986239026 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 1c78bd33e47c4b74abaffa2ef3708854, type: 3}
   m_PrefabInstance: {fileID: 1986239025}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1986239029
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 796743155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cff5e9791697c7541b00221ce42733cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactPopUp: {fileID: 1541054818}
+  offsetFromCamera: {x: 0, y: 1, z: 2.5}
+  interactLocator: {fileID: 330585550}
+--- !u!65 &1986239030
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 796743155}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.9, y: 0.6, z: 0.69488883}
+  m_Center: {x: 0, y: 0.3, z: -0.024999991}
+--- !u!114 &1986239031
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 796743155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 710acd3998ce9714491808edc9dffe4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  manager: {fileID: 132265697}
+  completed: 0
 --- !u!1001 &2000328594
 PrefabInstance:
   m_ObjectHideFlags: 0
