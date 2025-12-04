@@ -11,6 +11,7 @@ TagManager:
   - Mop
   - Dirt
   - Trash
+  - FakeSpaceShip
   layers:
   - Default
   - TransparentFX
