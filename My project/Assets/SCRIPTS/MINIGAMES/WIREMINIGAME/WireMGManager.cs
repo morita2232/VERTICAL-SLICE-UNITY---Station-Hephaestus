@@ -23,6 +23,8 @@ public class WireMGManager : MonoBehaviour
     // which computer is currently using the minigame
     private WireComputer currentOwner;
 
+    private bool isMinigameOpen = false;
+
     void Start()
     {
         if (panelRoot != null)
@@ -83,6 +85,7 @@ public class WireMGManager : MonoBehaviour
             panelRoot.SetActive(true);
 
         playerInteractLocator.isInminigame = true;
+        isMinigameOpen = true;
 
         Debug.Log("Wire minigame opened for " + owner.gameObject.name);
     }
@@ -157,7 +160,7 @@ public class WireMGManager : MonoBehaviour
             // notify the owning computer that its puzzle is done
             if (currentOwner != null)
                 currentOwner.MarkCompleted();
-
+            if (!isMinigameOpen) return;
             EndMinigame();
         }
     }
@@ -165,6 +168,7 @@ public class WireMGManager : MonoBehaviour
     private void EndMinigame()
     {
         playerInteractLocator.isInminigame = false;
+        isMinigameOpen = false;
         playerMovement.canMove = true;
         playerHorizontalMovement.canMove = true;
         playerVerticalMovement.canRotate = true;

@@ -14,6 +14,7 @@ public class BallBalancingManager : MonoBehaviour
     public PlaneMovement planeMovementScript;
     public InteractLocator playerInteractLocator;
 
+    private bool isMinigameOpen = false;
     public HorizontalMovement playerHorizontalMovement;
     public Movement playerMovement;
     public RotacionVertical playerVerticalMovement;
@@ -41,6 +42,8 @@ public class BallBalancingManager : MonoBehaviour
         planeMovementScript.movePlane = true;
 
         ChooseRandomCorrectHole();
+        playerInteractLocator.isInminigame = true;
+        isMinigameOpen = true;
         playerMovement.canMove = false;
         playerHorizontalMovement.canMove = false;
         playerVerticalMovement.canRotate = false;
@@ -71,20 +74,14 @@ public class BallBalancingManager : MonoBehaviour
     }
     public void OnBallLeftPlayArea(GameObject ball)
     {
-        // Optional: make sure it’s the current ball
+
         if (currentBall == ball)
         {
             Destroy(currentBall);
             planeMovementScript.movePlane = false;
 
-            // OPTION 1 – respawn the ball
             currentBall = Instantiate(ballPrefab, ballSpawnPoint.position, Quaternion.identity);
             planeMovementScript.movePlane = true;
-
-            // OPTION 2 – close the minigame
-            //mingameCam.SetActive(false);
-            //mainCam.SetActive(true);
-            //Debug.Log("Ball left play area, minigame ended.");
         }
     }
 
@@ -100,6 +97,7 @@ public class BallBalancingManager : MonoBehaviour
             Debug.Log("Correct hole! Minigame success.");
             currentOwner.MarkCompleted();
             // reward the player here if you want
+            if (!isMinigameOpen) return;
             EndMinigame();
         }
         else
@@ -124,6 +122,7 @@ public class BallBalancingManager : MonoBehaviour
         planeMovementScript.movePlane = false;
         Destroy(currentBall);
         playerInteractLocator.isInminigame = false;
+        isMinigameOpen = false;
         playerMovement.canMove = true;
         playerHorizontalMovement.canMove = true;
         playerVerticalMovement.canRotate = true;
@@ -142,6 +141,7 @@ public class BallBalancingManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Q))
         {
+            if (!isMinigameOpen) return;
             EndMinigame();
             return;
         }

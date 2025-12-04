@@ -17,7 +17,7 @@ public class Movement : MonoBehaviour
         inputs = new InputSystem_Actions();
         rb = GetComponent<Rigidbody>();
         cam = Camera.main;
-
+        Cursor.lockState = CursorLockMode.Locked;
         rb.freezeRotation = true;
     }
 

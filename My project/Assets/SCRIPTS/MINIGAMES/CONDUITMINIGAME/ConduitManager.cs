@@ -44,17 +44,31 @@ public class ConduitManager : MonoBehaviour
                 tubes[i].ResetTube();
             }
         }
+        Debug.Log("Conduit tubes reset.");
 
         SetActiveTube(activeIndex, false);
 
-        if (playerInteractLocator != null)
-            playerInteractLocator.isInminigame = true;
+        Debug.Log("Press " + startKey + " to start the conduit puzzle.");
 
-        if (playerMovement != null) playerMovement.canMove = false;
-        if (playerHorizontalMovement != null) playerHorizontalMovement.canMove = false;
-        if (playerVerticalMovement != null) playerVerticalMovement.canRotate = false;
+        playerInteractLocator.isInminigame = true;
+
+        Debug.Log("Player controls disabled.");
+
+        playerMovement.canMove = false;
+
+        Debug.Log("Player movement disabled.");
+
+        playerHorizontalMovement.canMove = false;
+
+        Debug.Log("Player horizontal movement disabled.");
+
+        playerVerticalMovement.canRotate = false;
+
+        Debug.Log("Player vertical movement disabled.");
 
         isMinigameOpen = true;
+
+        Debug.Log("Conduit minigame is now active.");
     }
 
     void Update()

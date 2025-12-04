@@ -81,11 +81,11 @@ public class RotacionVertical : MonoBehaviour
 
         Vector2 look = inputs.Player.Look.ReadValue<Vector2>();
 
-        // DEADZONE: if the stick/mouse is almost not moving, ignore it
-        if (look.sqrMagnitude < deadzone * deadzone)
+
+        // DEADZONE – only care about vertical component for this script
+        if (Mathf.Abs(look.y) < deadzone)
             return;
 
-        // look.y > 0 usually means "move mouse up" look down
         float deltaY = look.y * sensitivity;
 
         currentRotationX -= deltaY;
@@ -93,4 +93,5 @@ public class RotacionVertical : MonoBehaviour
 
         transform.localEulerAngles = new Vector3(currentRotationX, 0f, 0f);
     }
+
 }
