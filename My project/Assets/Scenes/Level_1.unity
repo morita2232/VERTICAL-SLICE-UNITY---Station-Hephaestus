@@ -5113,7 +5113,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chargeSpeed: 0.2
-  drainSpeed: 0.1
+  drainSpeed: 0.001
   targetRange: {x: 0.3, y: 0.7}
   targetMin: 0.4
   targetMax: 0.6
@@ -5893,6 +5893,7 @@ MonoBehaviour:
   shrinkRate: 0.1
   minScaleToDestroy: 0.1
   minMoveSpeed: 0.1
+  surfaceCleanRate: 0.2
   checklist: {fileID: 1207082819}
 --- !u!54 &869329786
 Rigidbody:
@@ -8499,7 +8500,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chargeSpeed: 0.2
-  drainSpeed: 0.1
+  drainSpeed: 0.001
   targetRange: {x: 0.3, y: 0.7}
   targetMin: 0.4
   targetMax: 0.6
@@ -11493,7 +11494,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chargeSpeed: 0.2
-  drainSpeed: 0.1
+  drainSpeed: 0.001
   targetRange: {x: 0.3, y: 0.7}
   targetMin: 0.4
   targetMax: 0.6
@@ -13396,6 +13397,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1c78bd33e47c4b74abaffa2ef3708854, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1986239031}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1c78bd33e47c4b74abaffa2ef3708854, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1986239032}
   m_SourcePrefab: {fileID: 100100000, guid: 1c78bd33e47c4b74abaffa2ef3708854, type: 3}
 --- !u!4 &1986239026 stripped
 Transform:
@@ -13452,6 +13456,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   manager: {fileID: 132265697}
   completed: 0
+--- !u!114 &1986239032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 796743155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e62042b3bd015e48bf6abecd3fe538d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  propertyName: _Slide
+  materialIndex: 1
+  value: 0
+  maxValue: 1
+  isClean: 0
+  unlockWhenClean: {fileID: 1986239029}
 --- !u!1001 &2000328594
 PrefabInstance:
   m_ObjectHideFlags: 0
