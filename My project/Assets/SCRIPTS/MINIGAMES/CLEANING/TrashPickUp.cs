@@ -17,7 +17,7 @@ public class TrashPickup : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0)) // Left click = pick up / drop
+        if (Input.GetKeyDown(KeyCode.E)) // Left click = pick up / drop
         {
             if (!isHeld)
                 TryPickUp();
@@ -30,7 +30,7 @@ public class TrashPickup : MonoBehaviour
             transform.position = cam.transform.position + cam.transform.forward * 2f; // follow camera
         }
 
-        if (Input.GetMouseButtonDown(1) && isHeld) // Right click = throw
+        if (Input.GetKeyDown(KeyCode.G) && isHeld) // Right click = throw
         {
             ThrowTrash();
         }

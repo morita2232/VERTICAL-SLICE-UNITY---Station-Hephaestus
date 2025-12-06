@@ -1,49 +1,21 @@
-//using UnityEngine;
-
-//public class BoundaryTrigger : MonoBehaviour
-//{
-//    public GameObject fakeSS;
-//    private Vector3 pos;
-
-//    private void Start()
-//    {
-//        Debug.Log("Existo");
-
-//         pos = fakeSS.transform.position;
-//    }
-
-//    private void Update()
-//    {
-
-//            if (!GetComponent<Collider>().bounds.Contains(fakeSS.transform.position))
-//            {
-//                Debug.Log("FakeSS started inside the bounds.");
-//                fakeSS.transform.position = new Vector3(-1 * pos.x, -1 * pos.y, 0);
-
-//            }
-
-
-//    }
-//}
-
 using UnityEngine;
 
 public class ScreenWrap3D : MonoBehaviour
 {
-    public Transform target;  // Ship or fakeSS
-    private BoxCollider box;  // The area you want to wrap
+    public Transform target;  // the ship
+    private BoxCollider box;
 
-    private void Awake()
+    void Awake()
     {
         box = GetComponent<BoxCollider>();
     }
 
-    private void Update()
+    void Update()
     {
         WrapTarget();
     }
 
-    private void WrapTarget()
+    void WrapTarget()
     {
         Vector3 pos = target.position;
         Bounds b = box.bounds;
@@ -56,7 +28,7 @@ public class ScreenWrap3D : MonoBehaviour
         if (pos.y > b.max.y) pos.y = b.min.y;
         else if (pos.y < b.min.y) pos.y = b.max.y;
 
-        // Z wrap
+        // Z wrap (if you're using 2D, you can omit this)
         if (pos.z > b.max.z) pos.z = b.min.z;
         else if (pos.z < b.min.z) pos.z = b.max.z;
 

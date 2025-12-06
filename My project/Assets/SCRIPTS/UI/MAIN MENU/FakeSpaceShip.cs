@@ -2,40 +2,84 @@ using UnityEngine;
 
 public class FakeSpaceShip : MonoBehaviour
 {
-    public float speed = 5f;
-    public float rotationSpeed = 45f;
+    [Header("Movement")]
+    public float speed = 1.5f;          // how fast it moves
+    public BoxCollider area;            // drag your Limits collider here
 
-    private Vector3 direction;
-    private float zRotationDirection;
+    [Header("Barrel Roll")]
+    public float rollSpeed = 90f;       // degrees per second
+
+    private Vector3 direction;          // current movement direction (XY plane)
+    private float rollAngle;            // current barrel roll angle
 
     void Start()
     {
-        float horizontal = Random.Range(-1f, 1f);
-        float vertical = Random.Range(-1f, 1f);
+        // ----- Random spawn position (z = 0) inside the area -----
+        if (area != null)
+        {
+            Bounds b = area.bounds;
 
-        direction = new Vector3(horizontal, vertical, 0f).normalized;
+            float x = Random.Range(b.min.x, b.max.x);
+            float y = Random.Range(b.min.y, b.max.y);
 
-        //zRotationDirection = Random.Range(-1f, 1f);
-        //if (zRotationDirection > 0f) zRotationDirection = 1f;
-        //else zRotationDirection = -1f;
+            transform.position = new Vector3(x, y, 0f);
+        }
+        else
+        {
+            Vector3 p = transform.position;
+            p.z = 0f;
+            transform.position = p;
+        }
+
+        // ----- Random 2D direction -----
+        Vector2 dir2 = Random.insideUnitCircle;
+        if (dir2.sqrMagnitude < 0.001f)
+            dir2 = Vector2.right;
+
+        direction = new Vector3(dir2.x, dir2.y, 0f).normalized;
     }
 
     void Update()
     {
+        // ----- 1) Move -----
         transform.position += direction * speed * Time.deltaTime;
 
-        //if (direction.sqrMagnitude > 0.001f)
-        //{
-        //    float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        // ----- 2) Wrap around the BoxCollider -----
+        Bounds b = area.bounds;
+        Vector3 pos = transform.position;
+        bool wrapped = false;
 
-        //    // This is the key fix — adjust angle offset to match your ship's model orientation
-        //    angle -= 90f;
+        if (pos.x > b.max.x) { pos.x = b.min.x; wrapped = true; }
+        else if (pos.x < b.min.x) { pos.x = b.max.x; wrapped = true; }
 
-        //    transform.rotation = Quaternion.Euler(0, 0, angle);
-        //}
+        if (pos.y > b.max.y) { pos.y = b.min.y; wrapped = true; }
+        else if (pos.y < b.min.y) { pos.y = b.max.y; wrapped = true; }
 
-        //transform.Rotate(0f, 0f, zRotationDirection * rotationSpeed * Time.deltaTime, Space.Self);
+        pos.z = 0f;
+        transform.position = pos;
+
+        // Optional: when we wrap, pick a new random direction
+        if (wrapped)
+        {
+            Vector2 dir2 = Random.insideUnitCircle;
+            if (dir2.sqrMagnitude < 0.001f)
+                dir2 = Vector2.right;
+
+            direction = new Vector3(dir2.x, dir2.y, 0f).normalized;
+        }
+
+        // ----- 3) Rotate so nose points along movement -----
+        // Assumes the ship’s nose points along local +X in the model.
+        Quaternion faceDir = Quaternion.FromToRotation(Vector3.right, direction);
+
+        // ----- 4) Barrel roll around the nose direction -----
+        rollAngle += rollSpeed * Time.deltaTime;
+        Quaternion roll = Quaternion.AngleAxis(rollAngle, direction);
+
+        transform.rotation = roll * faceDir;
     }
 }
+
+
 
 

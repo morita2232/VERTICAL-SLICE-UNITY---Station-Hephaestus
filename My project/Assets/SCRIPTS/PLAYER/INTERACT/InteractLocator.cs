@@ -11,6 +11,7 @@ public class InteractLocator : MonoBehaviour
     [Header("References")]
     public GameObject miniGame;
     public GameObject player;
+    public GameObject sSammy;
     public Transform spaceshipSpawn;
 
     private Camera mainCamera;
@@ -74,6 +75,7 @@ public class InteractLocator : MonoBehaviour
                 {
                     Debug.Log("Entering spaceship...");
                     player.transform.position = spaceshipSpawn.position;
+                    sSammy.transform.position = new Vector3(spaceshipSpawn.position.x + 1f, 0.3000002f, spaceshipSpawn.position.z);
                     isInSpaceShip = true;
                 }
 

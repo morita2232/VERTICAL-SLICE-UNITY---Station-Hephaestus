@@ -16,8 +16,8 @@ public class ConduitManager : MonoBehaviour
 
     [Header("Input")]
     public KeyCode startKey = KeyCode.E;
-    public KeyCode prevTubeKey = KeyCode.A; 
-    public KeyCode nextTubeKey = KeyCode.D;
+    public KeyCode prevTubeKey = KeyCode.S; 
+    public KeyCode nextTubeKey = KeyCode.W;
     public KeyCode exitKey = KeyCode.Q; 
 
     public bool solved { get; private set; }
@@ -91,11 +91,11 @@ public class ConduitManager : MonoBehaviour
     {
         if (!puzzleStarted)
         {
-            if (Input.GetKeyDown(startKey))
-            {
+            
+            
                 puzzleStarted = true;
                 SetActiveTube(activeIndex, true);
-            }
+            
             return;
         }
 
