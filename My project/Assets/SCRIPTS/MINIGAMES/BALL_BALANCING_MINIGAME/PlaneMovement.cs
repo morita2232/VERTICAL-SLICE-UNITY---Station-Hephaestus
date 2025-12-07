@@ -30,6 +30,12 @@ public class PlaneMovement : MonoBehaviour
         currentZ = e.z;
     }
 
+    void OnDisable()
+    {
+        if (inputs != null)
+            inputs.Disable();
+    }
+
     void Update()
     {
         if (!movePlane) return;

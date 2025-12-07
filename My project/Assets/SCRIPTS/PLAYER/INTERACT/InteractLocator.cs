@@ -25,6 +25,13 @@ public class InteractLocator : MonoBehaviour
         inputs.Enable();
     }
 
+
+    void OnDisable()
+    {
+        if (inputs != null)
+            inputs.Disable();
+    }
+
     void Update()
     {
 
