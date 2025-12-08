@@ -1,53 +1,4 @@
-//using UnityEngine;
-
-//public class Mop : MonoBehaviour
-//{
-//    public Transform holdPos; // assign MopHoldPos in inspector
-//    public bool holding;
-//    private void Update()
-//    {
-//        if (holding)
-//        {
-//            if (Input.GetKeyDown(KeyCode.G))
-//            {
-//                Drop();
-//            }
-//        }
-//    }
-//    public void PickUp()
-//    {
-//        holding = true;
-
-//        // Make mop follow the pivot
-//        transform.SetParent(holdPos);
-
-//        // Position at pivot
-//        transform.localPosition = Vector3.zero;
-
-//        // Rotate relative to pivot so it’s sideways in hand
-//        // Tweak these values until it looks right in game view
-//        transform.localRotation = Quaternion.Euler(0f, 90f, 0f);
-
-//    }
-
-//    public void Drop()
-//    {
-//        holding = false;
-
-//        transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-
-//        transform.position = new Vector3(
-//            transform.position.x,
-//            0.3000245f,
-//            transform.position.z
-//        );
-
-
-//        transform.SetParent(null);
-//    }
-
-//}
-
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -61,6 +12,8 @@ public class Mop : MonoBehaviour
     public Movement playerMovement;
     public HorizontalMovement horizontalLook;
     public RotacionVertical verticalLook;
+    public TMP_FontAsset sammyFont;
+    public Sprite sammyPortrait;
 
     [Header("Mop Control")]
     public KeyCode mopModeKey = KeyCode.Mouse1; // cleaning mode
@@ -82,6 +35,9 @@ public class Mop : MonoBehaviour
     Quaternion baseHandRot;
     float mopPitch;
     float mopYaw;
+
+    public static bool firstTimePickedUp = false;
+    public static System.Action OnFirstPickup;
 
     void Update()
     {
@@ -121,6 +77,21 @@ public class Mop : MonoBehaviour
         Vector3 worldOffset = transform.position - gripPoint.position;
         transform.position = holdPos.position + worldOffset;
         // At this point: GripPoint.position == holdPos.position
+
+        if (!firstTimePickedUp)
+        {
+            firstTimePickedUp = true;
+
+            DialogueManager.Instance.SayLines(
+                "Spammy Sammy",
+                new string[]
+                {
+                    "CONGRATS!!! You did it! I always knew you could.",
+                    "To activate cleaning mode press RIGHT CLICK and move your MOUSE around."
+                }, sammyFont, sammyPortrait
+            );
+
+        }
 
         // Initialize pitch/yaw relative to current hand rotation
         baseHandRot = holdPos.localRotation;

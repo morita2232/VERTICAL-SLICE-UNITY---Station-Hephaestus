@@ -13,7 +13,8 @@ public class Fade : MonoBehaviour
     public TextMeshProUGUI speakerText;   // name (Spammy Sammy)
     public TextMeshProUGUI textMesh;      // dialogue text
     public Image portraitImage;           // optional
-    public GameObject dialoguePanel;    // entire panel (for hiding/showing)
+    public GameObject dialoguePanel;      // entire panel (for hiding/showing)
+    public GameObject continueIcon;      // optional "press to continue" icon
 
     [Header("Fonts")]
     public TMP_FontAsset defaultFont;     // font applied to BOTH name + text
@@ -23,21 +24,23 @@ public class Fade : MonoBehaviour
 
     public bool IsFinished { get; private set; }
 
-    /// <summary> Fired when the last character appears. </summary>
+    /// <summary> Fired when the last character of the current line appears. </summary>
     public event Action OnFinished;
 
-    /// <summary> Fired when player presses a key/click after text is done and box is hidden. </summary>
+    /// <summary> Fired when player clicks/presses a key AFTER a line is finished. </summary>
     public event Action OnDismissed;
 
     void Awake()
     {
+        if (dialoguePanel == null)
+            dialoguePanel = gameObject;
+
         if (textMesh != null)
         {
             textMesh.ForceMeshUpdate();
             textMesh.maxVisibleCharacters = 0;
         }
 
-        // Make sure both start with the same font if one is set
         if (defaultFont != null)
         {
             if (speakerText != null) speakerText.font = defaultFont;
@@ -47,14 +50,13 @@ public class Fade : MonoBehaviour
 
     void Update()
     {
-        // After finishing typing, wait for any key / click to hide the dialogue
+        // After finishing typing, wait for any key / click to advance
         if (IsFinished && waitingForDismiss)
         {
             if (Input.anyKeyDown || Input.GetMouseButtonDown(0))
             {
                 waitingForDismiss = false;
-                dialoguePanel.SetActive(false);   // hide the whole dialogue panel
-                OnDismissed?.Invoke();
+                OnDismissed?.Invoke();   // tell listener: "player wants to continue"
             }
         }
     }
@@ -68,7 +70,9 @@ public class Fade : MonoBehaviour
         TMP_FontAsset overrideFont = null,
         Sprite portrait = null)
     {
-        gameObject.SetActive(true);   // make sure the box is visible
+        continueIcon.SetActive(false);
+        if (dialoguePanel != null)
+            dialoguePanel.SetActive(true);   // make sure the box is visible
 
         if (typingRoutine != null)
             StopCoroutine(typingRoutine);
@@ -113,10 +117,12 @@ public class Fade : MonoBehaviour
 
         typingRoutine = null;
         IsFinished = true;
-        waitingForDismiss = true;
-        OnFinished?.Invoke();   // finished typing, now waiting for input
+        continueIcon.SetActive(true);
+        waitingForDismiss = true;   // now wait for click/key
+        OnFinished?.Invoke();       // finished typing this line
     }
 }
+
 
 
 

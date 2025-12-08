@@ -36,12 +36,7 @@ public class Interactable : MonoBehaviour
         {
             if (!interactPopUp.activeSelf)
                 interactPopUp.SetActive(true);
-
-            // Update position & rotation only when visible
-            interactPopUp.transform.position = cam.position + cam.TransformDirection(offsetFromCamera);
-
-            interactPopUp.transform.rotation =
-                Quaternion.LookRotation(interactPopUp.transform.position - cam.position);
+      
         }
         else
         {

@@ -1,5 +1,6 @@
-using TMPro;
 using UnityEngine;
+using TMPro;
+using UnityEngine.UI;
 
 public class IntroDialogue : MonoBehaviour
 {
@@ -24,22 +25,20 @@ public class IntroDialogue : MonoBehaviour
     {
         LockPlayer(true);
 
-        if (lines == null || lines.Length == 0)
+        if (fade == null || lines == null || lines.Length == 0)
         {
             LockPlayer(false);
             return;
         }
 
-        // Listen for "finished typing"
-        fade.OnFinished += HandleTextFinished;
+        // We only care about "player clicked to continue"
+        fade.OnDismissed += HandleLineAdvance;
 
-        // Listen for "player pressed key, box hidden"
-        fade.OnDismissed += HandleDialogueDismissed;
-
-        PlayCurrentLine();
+        // Start first line
+        ShowCurrentLine();
     }
 
-    void PlayCurrentLine()
+    void ShowCurrentLine()
     {
         fade.ShowText(
             robotName,
@@ -49,30 +48,22 @@ public class IntroDialogue : MonoBehaviour
         );
     }
 
-    void HandleTextFinished()
+    void HandleLineAdvance()
     {
-        // If there are more lines, start the next one immediately
         currentLineIndex++;
 
+        // More lines? Show next one.
         if (currentLineIndex < lines.Length)
         {
-            PlayCurrentLine();
+            ShowCurrentLine();
         }
         else
         {
-            // Last line has finished typing, now we just wait for a key press
-            // Unlock will happen in HandleDialogueDismissed
+            // No more lines: end dialogue, unlock player, hide panel
+            fade.dialoguePanel.SetActive(false);
+            fade.OnDismissed -= HandleLineAdvance;
+            LockPlayer(false);
         }
-    }
-
-    void HandleDialogueDismissed()
-    {
-        // All done, let the player move and look around
-        LockPlayer(false);
-
-        // No need for further events
-        fade.OnFinished -= HandleTextFinished;
-        fade.OnDismissed -= HandleDialogueDismissed;
     }
 
     void LockPlayer(bool locked)
@@ -89,5 +80,6 @@ public class IntroDialogue : MonoBehaviour
             verticalLook.canRotate = canMove;
     }
 }
+
 
 
