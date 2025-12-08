@@ -6,9 +6,13 @@ public class CheckList : MonoBehaviour
     private BallBalanceObject[] balanceObjects;
     private ConduitObject[] conduitObjects;
     private GameObject[] dirt;
+    private GameObject[] trash;
 
     public int allDirt = 0;
     public int remaining = 0;
+
+    public int allTrash = 0;
+    public int remainingTrash = 0;
 
     [Header("Attributes")]
     public Vector2 uiOffset = new Vector2(10f, 10f);
@@ -20,12 +24,15 @@ public class CheckList : MonoBehaviour
         balanceObjects = FindObjectsByType<BallBalanceObject>(FindObjectsSortMode.None);
         conduitObjects = FindObjectsByType<ConduitObject>(FindObjectsSortMode.None);
         dirt = GameObject.FindGameObjectsWithTag("Dirt");
+        trash = GameObject.FindGameObjectsWithTag("Trash");
     }
 
     void OnGUI()
     {
         // IMPORTANT: reset counters each draw
         remaining = 0;
+        remainingTrash = 0;
+        allTrash = 0;
         allDirt = 0;
 
         Rect area = new Rect(uiOffset.x, uiOffset.y, uiSize.x, uiSize.y);
@@ -98,8 +105,28 @@ public class CheckList : MonoBehaviour
             }
         }
 
-        // Summary
-        GUILayout.Space(5);
+        if (trash != null)
+        {
+            foreach (var obj in trash)
+            {
+                if (obj == null) continue;
+
+                allTrash++;
+
+                if (obj.activeSelf)
+                {
+                    remainingTrash++;
+                    remaining++;
+                }
+            }
+            if (allTrash > 0)
+            {
+                GUILayout.Label("• Dispose " + allTrash);
+            }
+        }
+
+            // Summary
+            GUILayout.Space(5);
 
         if (remaining == 0)
             GUILayout.Label("All tasks complete!");

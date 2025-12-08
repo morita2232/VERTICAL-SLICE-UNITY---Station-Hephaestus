@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Renderer))]
@@ -13,7 +14,8 @@ public class CleanableSurface : MonoBehaviour
     public bool isClean = false;
 
     [Header("Unlock When Clean")]
-    public Behaviour unlockWhenClean;     // e.g. Interactable script
+    public ParticleSystem cleanParticles;
+
 
     Renderer rend;
     MaterialPropertyBlock mpb;
@@ -29,8 +31,6 @@ public class CleanableSurface : MonoBehaviour
 
         ApplyToMaterial();
 
-        if (unlockWhenClean != null)
-            unlockWhenClean.enabled = isClean;   // usually false at start
     }
 
     public void Clean(float amount)
@@ -43,9 +43,21 @@ public class CleanableSurface : MonoBehaviour
         if (!isClean && value >= maxValue - 0.0001f)
         {
             isClean = true;
-            if (unlockWhenClean != null)
-                unlockWhenClean.enabled = true;
+
+            if (cleanParticles != null)
+                StartCoroutine(PlayCleanParticles());
         }
+    }
+
+    private IEnumerator PlayCleanParticles()
+    {
+        cleanParticles.gameObject.SetActive(true);
+        cleanParticles.Play();
+
+        yield return new WaitForSeconds(5f);
+
+        cleanParticles.Stop();
+        cleanParticles.gameObject.SetActive(false);
     }
 
     void ApplyToMaterial()

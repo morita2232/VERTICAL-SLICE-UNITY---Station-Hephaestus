@@ -64,8 +64,15 @@ public class InteractLocator : MonoBehaviour
                     var balanceComp = hit.collider.GetComponent<BallBalanceObject>();
                     var conduitComp = hit.collider.GetComponent<ConduitObject>();
 
+
                     var cleanable = hit.collider.GetComponent<CleanableSurface>();
-                   
+
+                    Debug.Log(
+      $"Hit {hit.collider.name} | Layer:{LayerMask.LayerToName(hit.collider.gameObject.layer)} " +
+      $"| Tag:{hit.collider.tag} | Cleanable:{(cleanable ? "YES" : "NO")} " +
+      $"| IsClean:{(cleanable ? cleanable.IsClean : false)}"
+  );
+
                     if (cleanable != null && !cleanable.IsClean)
                     {
                         DialogueManager.Instance.SayLines(
@@ -78,7 +85,7 @@ public class InteractLocator : MonoBehaviour
                         return;
                     }
 
-                    if (wireComp != null)
+                   else if (wireComp != null)
                     {
                         if (isTutorial)
                         {
@@ -94,7 +101,7 @@ public class InteractLocator : MonoBehaviour
                         wireComp.Interact();   // this calls WireMGManager.OpenForComputer(...)
                     }
 
-                    if(balanceComp != null)
+                   else if(balanceComp != null)
                     {
                         if (isTutorial)
                         {
@@ -111,7 +118,7 @@ public class InteractLocator : MonoBehaviour
                         balanceComp.Interact();
                     }
 
-                    if(conduitComp != null)
+                   else if(conduitComp != null)
                     {
                         if (isTutorial)
                         {
@@ -151,6 +158,7 @@ public class InteractLocator : MonoBehaviour
         else
         {
             canInteract = false;
+            Debug.Log("Raycast hit nothing in interactMask");
         }
     }
 
