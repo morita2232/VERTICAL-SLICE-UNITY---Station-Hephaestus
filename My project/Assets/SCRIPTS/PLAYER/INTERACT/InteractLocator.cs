@@ -29,21 +29,22 @@ public class InteractLocator : MonoBehaviour
     void Start()
     {
         mainCamera = Camera.main;
-        inputs = new InputSystem_Actions();
-        inputs.Enable();
+        //inputs = new InputSystem_Actions();
+        //inputs.Enable();
     }
 
 
-    void OnDisable()
-    {
-        if (inputs != null)
-            inputs.Disable();
-    }
+    //void OnDisable()
+    //{
+    //    if (inputs != null)
+    //        inputs.Disable();
+    //}
 
     void Update()
     {
 
-        clicked = inputs.Player.Interact.ReadValue<float>() > 0;
+        //clicked = inputs.Player.Interact.ReadValue<float>() > 0;
+        clicked = Input.GetKeyDown(KeyCode.E);
 
         Debug.Log($"InteractLocator Update() | clicked: {clicked}");
 

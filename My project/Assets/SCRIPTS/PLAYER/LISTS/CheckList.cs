@@ -12,6 +12,7 @@ public class CheckList : MonoBehaviour
     public TMP_FontAsset sammyFont;
     public Sprite sammyPortrait;
     public bool isTutorial = false;
+    private bool finished = false;
 
     public int allDirt = 0;
     public int remaining = 0;
@@ -25,6 +26,9 @@ public class CheckList : MonoBehaviour
 
     void Awake()
     {
+        if(SceneManager.GetActiveScene().name == "Tutorial") {
+            isTutorial = true;
+        }
         wireComputers = FindObjectsByType<WireComputer>(FindObjectsSortMode.None);
         balanceObjects = FindObjectsByType<BallBalanceObject>(FindObjectsSortMode.None);
         conduitObjects = FindObjectsByType<ConduitObject>(FindObjectsSortMode.None);
@@ -34,7 +38,7 @@ public class CheckList : MonoBehaviour
 
     void OnGUI()
     {
-        // IMPORTANT: reset counters each draw
+        //// IMPORTANT: reset counters each draw
         remaining = 0;
         remainingTrash = 0;
         allTrash = 0;
@@ -133,27 +137,41 @@ public class CheckList : MonoBehaviour
             // Summary
             GUILayout.Space(5);
 
-        if (remaining == 0)
+        if (remaining <= 0)
         {
             GUILayout.Label("All tasks complete!");
-            if (isTutorial)
+            if (!finished)
             {
-                DialogueManager.OnDialogueSequenceFinished += LoadNextLevel;
-                DialogueManager.Instance.SayLines(
-                    "Spammy Sammy",
-                    new string[]
-                    {
-                        "Now that you know the basics you are ready to work for our great bosses!!!.",
-                        "GOOD LUCK OUT THERE!!!"
-                    }, sammyFont, sammyPortrait
-                );
-
+                finito();
+                finished = true;
             }
+
         }
         else
+        {
             GUILayout.Label("Remaining: " + remaining);
+        }
 
         GUILayout.EndArea();
+    }
+    
+    void finito()
+    {
+        if (isTutorial)
+        {
+
+
+
+            DialogueManager.OnDialogueSequenceFinished += LoadNextLevel;
+            DialogueManager.Instance.SayLines(
+                "Spammy Sammy",
+                new string[]
+                {
+                        "Now that you know the basics you are ready to work for our great bosses!!!.",
+                        "GOOD LUCK OUT THERE!!!"
+                }, sammyFont, sammyPortrait
+            );
+        }
     }
 
     void LoadNextLevel()
