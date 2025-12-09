@@ -1,4 +1,6 @@
+using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CheckList : MonoBehaviour
 {
@@ -7,6 +9,9 @@ public class CheckList : MonoBehaviour
     private ConduitObject[] conduitObjects;
     private GameObject[] dirt;
     private GameObject[] trash;
+    public TMP_FontAsset sammyFont;
+    public Sprite sammyPortrait;
+    public bool isTutorial = false;
 
     public int allDirt = 0;
     public int remaining = 0;
@@ -129,12 +134,36 @@ public class CheckList : MonoBehaviour
             GUILayout.Space(5);
 
         if (remaining == 0)
+        {
             GUILayout.Label("All tasks complete!");
+            if (isTutorial)
+            {
+                DialogueManager.OnDialogueSequenceFinished += LoadNextLevel;
+                DialogueManager.Instance.SayLines(
+                    "Spammy Sammy",
+                    new string[]
+                    {
+                        "Now that you know the basics you are ready to work for our great bosses!!!.",
+                        "GOOD LUCK OUT THERE!!!"
+                    }, sammyFont, sammyPortrait
+                );
+
+            }
+        }
         else
             GUILayout.Label("Remaining: " + remaining);
 
         GUILayout.EndArea();
     }
+
+    void LoadNextLevel()
+    {
+        // Always unsubscribe so it only fires once
+        DialogueManager.OnDialogueSequenceFinished -= LoadNextLevel;
+
+        SceneManager.LoadScene("Level_1");
+    }
+
 }
 
 

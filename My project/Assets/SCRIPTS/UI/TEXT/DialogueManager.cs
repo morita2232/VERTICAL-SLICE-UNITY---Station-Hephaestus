@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using TMPro;
@@ -8,6 +9,10 @@ public class DialogueManager : MonoBehaviour
     public static DialogueManager Instance;
 
     public Fade fade;
+
+    //  Fired after the *whole* dialogue sequence is finished
+    // (all lines shown AND last one dismissed by player)
+    public static event Action OnDialogueSequenceFinished;
 
     void Awake()
     {
@@ -41,6 +46,9 @@ public class DialogueManager : MonoBehaviour
         // single line finished & clicked -> hide
         if (fade.dialoguePanel != null)
             fade.dialoguePanel.SetActive(false);
+
+        // notify listeners that the dialogue sequence is over
+        OnDialogueSequenceFinished?.Invoke();
     }
 
     IEnumerator SayLinesRoutine(string speaker, string[] lines, TMP_FontAsset font, Sprite portrait)
@@ -62,7 +70,11 @@ public class DialogueManager : MonoBehaviour
         // all lines done & last one clicked -> hide
         if (fade.dialoguePanel != null)
             fade.dialoguePanel.SetActive(false);
+
+        // notify listeners that the dialogue sequence is over
+        OnDialogueSequenceFinished?.Invoke();
     }
 }
+
 
 

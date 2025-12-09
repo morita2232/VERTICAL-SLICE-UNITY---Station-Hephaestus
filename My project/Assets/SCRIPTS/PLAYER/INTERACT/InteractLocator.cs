@@ -17,6 +17,10 @@ public class InteractLocator : MonoBehaviour
     public TMP_FontAsset sammyFont;
     public Sprite sammyPortrait;
 
+    public GameObject conduitObject;
+    public GameObject ballBalanceObject;
+    public GameObject wireComputerObject;
+
     private Camera mainCamera;
     private InputSystem_Actions inputs;
     private bool clicked;
@@ -41,6 +45,8 @@ public class InteractLocator : MonoBehaviour
 
         clicked = inputs.Player.Interact.ReadValue<float>() > 0;
 
+        Debug.Log($"InteractLocator Update() | clicked: {clicked}");
+
         Ray ray = mainCamera.ScreenPointToRay(
             new Vector3(Screen.width / 2, Screen.height / 2, 0));
         RaycastHit hit;
@@ -48,7 +54,7 @@ public class InteractLocator : MonoBehaviour
         if (Physics.Raycast(ray, out hit, 2f, interactMask))
         {
             canInteract = true;
-            Debug.Log("Interacted with: " + hit.collider.gameObject.name);
+   
 
             bool isMinigameObject = hit.collider.CompareTag("Miniggame");
             bool isSpaceShipObject = hit.collider.CompareTag("SpaceShip");
@@ -68,10 +74,10 @@ public class InteractLocator : MonoBehaviour
                     var cleanable = hit.collider.GetComponent<CleanableSurface>();
 
                     Debug.Log(
-      $"Hit {hit.collider.name} | Layer:{LayerMask.LayerToName(hit.collider.gameObject.layer)} " +
-      $"| Tag:{hit.collider.tag} | Cleanable:{(cleanable ? "YES" : "NO")} " +
-      $"| IsClean:{(cleanable ? cleanable.IsClean : false)}"
-  );
+                        $"Hit {hit.collider.name} | Layer:{LayerMask.LayerToName(hit.collider.gameObject.layer)} " +
+                        $"| Tag:{hit.collider.tag} | Cleanable:{(cleanable ? "YES" : "NO")} " +
+                        $"| IsClean:{(cleanable ? cleanable.IsClean : false)}"
+                    );
 
                     if (cleanable != null && !cleanable.IsClean)
                     {
@@ -86,7 +92,7 @@ public class InteractLocator : MonoBehaviour
                     }
 
                    else if (wireComp != null)
-                    {
+                   {
                         if (isTutorial)
                         {
                             DialogueManager.Instance.SayLines(
@@ -99,6 +105,7 @@ public class InteractLocator : MonoBehaviour
                                );
                         }
                         wireComp.Interact();   // this calls WireMGManager.OpenForComputer(...)
+                        wireComp = null;
                     }
 
                    else if(balanceComp != null)
@@ -110,30 +117,42 @@ public class InteractLocator : MonoBehaviour
                                new string[]
                                {
                                 "To fix this machine you will have to recalibrate the balance mechanism",
-                                 "Use your MOVEMENT KEYS to balance the ball and guide it to the RED hole"},
+                                 "Use W/A/S/D to balance the ball and guide it to the RED hole"},
                                  sammyFont, sammyPortrait
                                );
 
                         }
                         balanceComp.Interact();
+                        balanceComp = null;
                     }
-
-                   else if(conduitComp != null)
+                    else if (conduitComp != null)
                     {
                         if (isTutorial)
                         {
+                            // 1. Disable interaction until Sammy finishes talking
+                            DialogueManager.OnDialogueSequenceFinished += StartConduitAfterDialogue;
+
+                            // 2. Sammy explains how the minigame works
                             DialogueManager.Instance.SayLines(
-                               "Spammy Sammy",
-                               new string[]
-                               {
-                                 "To fix this machine you will have to restore the energy from the systems",
-                                 "Use your W to change to the next conduit, S to change to the previous conduit",
-                                 "Balance their energy until they reach the red bars at the same time"},
-                                 sammyFont, sammyPortrait
-                               );
+                                "Spammy Sammy",
+                                new string[]
+                                {
+                                    "To fix this machine you will have to restore the energy from the systems.",
+                                    "Use your W to change to the next conduit, S to change to the previous conduit.",
+                                    "Balance their energy until they reach the red bars at the same time."
+                                },
+                                sammyFont, sammyPortrait
+                            );
 
                         }
+                        else
+                        {
+
                         conduitComp.Interact();
+                            conduitComp = null;
+                        }
+
+                        
                     }
 
                 }
@@ -151,6 +170,7 @@ public class InteractLocator : MonoBehaviour
                 {
                     var mopComp = hit.collider.GetComponent<Mop>();
                     mopComp.PickUp();
+                    mopComp = null;
                     Debug.Log("A limpiar guarrilla");
                 }
             }
@@ -159,6 +179,25 @@ public class InteractLocator : MonoBehaviour
         {
             canInteract = false;
             Debug.Log("Raycast hit nothing in interactMask");
+        }
+    }
+    void StartConduitAfterDialogue()
+    {
+        // Always unsubscribe so it doesn't trigger again
+        DialogueManager.OnDialogueSequenceFinished -= StartConduitAfterDialogue;
+
+        // Start the conduit minigame AFTER Sammy finishes talking
+        var ray = mainCamera.ScreenPointToRay(
+            new Vector3(Screen.width / 2, Screen.height / 2, 0));
+
+        if (Physics.Raycast(ray, out RaycastHit hit, 2f, interactMask))
+        {
+            var conduitComp = hit.collider.GetComponentInParent<ConduitObject>();
+            if (conduitComp != null)
+            {
+                conduitComp.Interact();
+                conduitComp = null;
+            }
         }
     }
 
