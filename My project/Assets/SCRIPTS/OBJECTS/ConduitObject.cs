@@ -7,6 +7,14 @@ public class ConduitObject : MonoBehaviour
 
     [Header("Object attributes")]
     public bool completed;
+    public ParticleSystem activeParticles;
+
+    void Start()
+    {
+        if (!completed && activeParticles != null)
+            activeParticles.Play();
+    }
+
 
     public void Interact()
     {
@@ -23,5 +31,7 @@ public class ConduitObject : MonoBehaviour
     {
         completed = true;
         Debug.Log(name + ": conduit puzzle completed!");
+        if (activeParticles != null)
+            activeParticles.Stop();
     }
 }

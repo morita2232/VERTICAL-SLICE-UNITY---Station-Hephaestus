@@ -22,7 +22,6 @@ public class IntroDialogue : MonoBehaviour
     [TextArea(3, 6)]
     public string[] lines;
 
-    private int currentLineIndex = 0;
 
     void Start()
     {

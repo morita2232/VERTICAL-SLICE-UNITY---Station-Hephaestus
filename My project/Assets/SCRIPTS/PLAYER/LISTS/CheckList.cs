@@ -1,6 +1,8 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class CheckList : MonoBehaviour
 {
@@ -23,6 +25,10 @@ public class CheckList : MonoBehaviour
     [Header("Attributes")]
     public Vector2 uiOffset = new Vector2(10f, 10f);
     public Vector2 uiSize = new Vector2(250f, 200f);
+
+    [Header("Loading Screen")]
+    public GameObject loadingScreen;
+    public Slider loadingBar;
 
     void Awake()
     {
@@ -160,8 +166,6 @@ public class CheckList : MonoBehaviour
         if (isTutorial)
         {
 
-
-
             DialogueManager.OnDialogueSequenceFinished += LoadNextLevel;
             DialogueManager.Instance.SayLines(
                 "Spammy Sammy",
@@ -176,10 +180,33 @@ public class CheckList : MonoBehaviour
 
     void LoadNextLevel()
     {
-        // Always unsubscribe so it only fires once
+        // Desuscribirse para que solo se llame una vez
         DialogueManager.OnDialogueSequenceFinished -= LoadNextLevel;
 
-        SceneManager.LoadScene("Level_1");
+        // Empezar la carga asíncrona con pantalla de carga
+        StartCoroutine(LoadSceneAsynchronously("Level_1"));
+    }
+
+
+
+    IEnumerator LoadSceneAsynchronously(string sceneName)
+    {
+        loadingScreen.SetActive(true);
+
+        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
+        operation.allowSceneActivation = true;   // opcional, por si luego quieres hacer cosas fancy
+
+        while (!operation.isDone)
+        {
+            // Opcional: normalizar a 0–1 porque progress llega solo hasta 0.9
+            float progress = Mathf.Clamp01(operation.progress / 0.9f);
+            loadingBar.value = progress;
+
+            // Debug para ver cuánto va cargando
+            // Debug.Log(progress);
+
+            yield return null;
+        }
     }
 
 }

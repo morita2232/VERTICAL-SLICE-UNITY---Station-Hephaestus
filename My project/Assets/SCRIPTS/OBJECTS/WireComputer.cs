@@ -7,6 +7,14 @@ public class WireComputer : MonoBehaviour
         
     [Header("Object attributes")]
     public bool completed;
+    public ParticleSystem activeParticles;
+
+    void Start()
+    {
+        if (!completed && activeParticles != null)
+            activeParticles.Play();
+    }
+
 
     // called when player presses E on this computer
     public void Interact()
@@ -24,7 +32,8 @@ public class WireComputer : MonoBehaviour
     {
         completed = true;
         Debug.Log(name + ": puzzle completed!");
-
+        if (activeParticles != null)
+            activeParticles.Stop();
     }
 }
 
