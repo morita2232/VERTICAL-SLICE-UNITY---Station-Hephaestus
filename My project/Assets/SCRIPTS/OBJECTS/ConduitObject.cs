@@ -8,6 +8,9 @@ public class ConduitObject : MonoBehaviour
     [Header("Object attributes")]
     public bool completed;
     public ParticleSystem activeParticles;
+    public AudioSource sfxSource;
+    public AudioClip completionSfx;
+
 
     void Start()
     {
@@ -31,7 +34,12 @@ public class ConduitObject : MonoBehaviour
     {
         completed = true;
         Debug.Log(name + ": conduit puzzle completed!");
+
         if (activeParticles != null)
             activeParticles.Stop();
+
+        if (sfxSource != null && completionSfx != null)
+            sfxSource.PlayOneShot(completionSfx);
     }
+
 }
