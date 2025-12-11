@@ -1,5 +1,11 @@
+using NUnit.Framework;
+using System.ComponentModel;
+using System.Threading;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
+using UnityEngine.Rendering.VirtualTexturing;
 
 public class InteractLocator : MonoBehaviour
 {
@@ -8,7 +14,8 @@ public class InteractLocator : MonoBehaviour
     public bool isInminigame = false;
     public bool canInteract = false;
     public bool isInSpaceShip = false;
-    
+    private bool oneTime = false;
+
     [Header("References")]
     public GameObject miniGame;
     public GameObject player;
@@ -60,6 +67,7 @@ public class InteractLocator : MonoBehaviour
             bool isMinigameObject = hit.collider.CompareTag("Miniggame");
             bool isSpaceShipObject = hit.collider.CompareTag("SpaceShip");
             bool isMopObject = hit.collider.CompareTag("Mop");
+            bool isAlien = hit.collider.CompareTag("Alien");
 
             // Only DO things when the interact button is actually pressed
             if (clicked)
@@ -161,18 +169,44 @@ public class InteractLocator : MonoBehaviour
                 // ---- SPACESHIP ----
                 if (isSpaceShipObject)
                 {
-                    Debug.Log("Entering spaceship...");
-                    player.transform.position = spaceshipSpawn.position;
-                    sSammy.transform.position = new Vector3(spaceshipSpawn.position.x + 1f, 0.3000002f, spaceshipSpawn.position.z);
-                    isInSpaceShip = true;
-                }
+                    if (!oneTime)
+                    {
+                        // 1. Disable interaction until Sammy finishes talking
+                        DialogueManager.OnDialogueSequenceFinished += EnterSpaceShip;
 
+                        // 2. Sammy explains how the minigame works
+                        DialogueManager.Instance.SayLines(
+                        "Spammy Sammy",
+                        new string[]
+                        {
+                            "Attention. Prior to entry, be aware that a classified alien entity has been detected inside.",
+                            "Company threat assessment rates the subject as high-risk. ",
+                            "Engage with caution and follow all safety procedures."
+                            },
+                        sammyFont, sammyPortrait
+                        );
+                        oneTime = true;
+                    }
+                   
+                    else { 
+                        Debug.Log("Entering spaceship...");
+                        player.transform.position = spaceshipSpawn.position;
+                        isInSpaceShip = true;
+                    } 
+                }
                 if (isMopObject)
                 {
                     var mopComp = hit.collider.GetComponent<Mop>();
                     mopComp.PickUp();
                     mopComp = null;
                     Debug.Log("A limpiar guarrilla");
+                }
+                if (isAlien)
+                {
+                    var alienComp = hit.collider.GetComponent<AlienInteraction>();
+                    alienComp.Interact();
+                    alienComp = null;
+                    Debug.Log("Interacting with Alien");
                 }
             }
         }
@@ -201,6 +235,24 @@ public class InteractLocator : MonoBehaviour
             }
         }
     }
+
+    void EnterSpaceShip()
+    {
+        // Always unsubscribe so it only fires once
+        DialogueManager.OnDialogueSequenceFinished -= EnterSpaceShip;
+
+        // Optional safety: check references
+        if (player == null || spaceshipSpawn == null)
+        {
+            Debug.LogWarning("EnterSpaceShip: player or spaceshipSpawn is null");
+            return;
+        }
+
+        Debug.Log("Entering spaceship...");
+        player.transform.position = spaceshipSpawn.position;
+        isInSpaceShip = true;
+    }
+
 
     private void OnDrawGizmos()
     {

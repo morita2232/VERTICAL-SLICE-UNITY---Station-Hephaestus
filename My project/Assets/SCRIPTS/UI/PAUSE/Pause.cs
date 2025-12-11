@@ -5,6 +5,7 @@ public class Pause : MonoBehaviour
 {
     public GameObject pauseMenuUI;
     public GameObject settingsMenuUI;
+    public GameObject textUI;
     public static bool isPaused = false;
 
     public Movement playerMovement;
@@ -30,10 +31,12 @@ public class Pause : MonoBehaviour
         {
             if (isPaused)
             {
+                settingsMenuUI.SetActive(false);
                 Resume();
             }
             else
             {
+                textUI.SetActive(false);
                 PauseGame();
             }
         }
@@ -48,6 +51,7 @@ public class Pause : MonoBehaviour
         horizontalLook.canMove = true;
         verticalLook.canRotate = true;
         pauseMenuUI.SetActive(false);
+        settingsMenuUI.SetActive(false);
         Time.timeScale = 1f;
         isPaused = false;
     }
@@ -59,6 +63,7 @@ public class Pause : MonoBehaviour
         horizontalLook.canMove = false;
         verticalLook.canRotate = false;
         pauseMenuUI.SetActive(true);
+        textUI.SetActive(false);
         Time.timeScale = 0f;
         isPaused = true;
     }
@@ -83,6 +88,13 @@ public class Pause : MonoBehaviour
 
     }
 
+    public void RestartLevel()
+    {
+        isPaused = false;
+        Time.timeScale = 1f;
+        pauseMenuUI.SetActive(isPaused);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
     public void ExitGame()
     {
         #if UNITY_EDITOR

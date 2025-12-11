@@ -12,6 +12,7 @@ TagManager:
   - Dirt
   - Trash
   - FakeSpaceShip
+  - Alien
   layers:
   - Default
   - TransparentFX
