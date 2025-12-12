@@ -17,6 +17,7 @@ public class WireMGManager : MonoBehaviour
     [Header("Wire lists")]
     public List<WireStart> wireStart;
     public List<WireEnd> wireEnd;
+    public GameObject crossHair;
 
     private Dictionary<WireStart, WireEnd> pairings = new Dictionary<WireStart, WireEnd>();
 
@@ -86,7 +87,7 @@ public class WireMGManager : MonoBehaviour
 
         playerInteractLocator.isInminigame = true;
         isMinigameOpen = true;
-
+        crossHair.SetActive(false);
         Debug.Log("Wire minigame opened for " + owner.gameObject.name);
     }
 
@@ -104,6 +105,7 @@ public class WireMGManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Q))
         {
             EndMinigame();
+ 
             return;
         }
 
@@ -173,6 +175,7 @@ public class WireMGManager : MonoBehaviour
         playerHorizontalMovement.canMove = true;
         playerVerticalMovement.canRotate = true;
         Cursor.lockState = CursorLockMode.Locked;
+        crossHair.SetActive(true);
 
         if (panelRoot != null)
             panelRoot.SetActive(false);

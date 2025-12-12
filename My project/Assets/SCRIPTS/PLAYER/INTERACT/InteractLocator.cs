@@ -181,7 +181,8 @@ public class InteractLocator : MonoBehaviour
                         {
                             "Attention. Prior to entry, be aware that a classified alien entity has been detected inside.",
                             "Company threat assessment rates the subject as high-risk. ",
-                            "Engage with caution and follow all safety procedures."
+                            "Engage with caution and follow all safety procedures.",
+                            "(Also do not forget you can come out the spaceship pressing your R KEY)"
                             },
                         sammyFont, sammyPortrait
                         );

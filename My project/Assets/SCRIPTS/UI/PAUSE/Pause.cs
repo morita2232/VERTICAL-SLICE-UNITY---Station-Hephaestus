@@ -11,6 +11,7 @@ public class Pause : MonoBehaviour
     public Movement playerMovement;
     public HorizontalMovement horizontalLook;
     public RotacionVertical verticalLook;
+    public GameObject crosshair;
     void Awake()
     {
         pauseMenuUI.SetActive(isPaused);
@@ -32,11 +33,13 @@ public class Pause : MonoBehaviour
             if (isPaused)
             {
                 settingsMenuUI.SetActive(false);
+                crosshair.SetActive(true);
                 Resume();
             }
             else
             {
                 textUI.SetActive(false);
+                crosshair.SetActive(false);
                 PauseGame();
             }
         }

@@ -18,6 +18,7 @@ public class BallBalancingManager : MonoBehaviour
     public HorizontalMovement playerHorizontalMovement;
     public Movement playerMovement;
     public RotacionVertical playerVerticalMovement;
+    public GameObject crosshair;
 
     [Header("Holes")]
     // Assign these in the inspector – one Renderer for each hole or ring mesh
@@ -36,6 +37,7 @@ public class BallBalancingManager : MonoBehaviour
 
         mingameCam.SetActive(true);
         mainCam.SetActive(false);
+        crosshair.SetActive(false);
 
         currentBall = Instantiate(ballPrefab, ballSpawnPoint.position, Quaternion.identity);
 
@@ -121,6 +123,7 @@ public class BallBalancingManager : MonoBehaviour
     {
         planeMovementScript.movePlane = false;
         Destroy(currentBall);
+        crosshair.SetActive(true);
         playerInteractLocator.isInminigame = false;
         isMinigameOpen = false;
         playerMovement.canMove = true;

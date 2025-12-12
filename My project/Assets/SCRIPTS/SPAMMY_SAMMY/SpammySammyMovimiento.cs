@@ -9,7 +9,7 @@ public class SpammySammyMovimiento : MonoBehaviour
     public float followDistance = 2f;
     public float moveSpeed = 4f;
     public float rotateSpeed = 10f;
-
+    public InteractLocator interactLocator;
     private Vector3 lastPosition;
 
     void Start()
@@ -20,6 +20,7 @@ public class SpammySammyMovimiento : MonoBehaviour
     void Update()
     {
         if (!playerPos) return;
+        if (interactLocator.isInSpaceShip) return;
 
         Vector3 playerFlat = new Vector3(playerPos.position.x, transform.position.y, playerPos.position.z);
         Vector3 toPlayer = playerFlat - transform.position;
