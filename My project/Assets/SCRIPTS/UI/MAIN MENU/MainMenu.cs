@@ -5,6 +5,7 @@ public class MainMenu : MonoBehaviour
 {
 
     public GameObject settingsPanel;
+    public GameObject crreditsPanel;
 
     public void StartGame()
     {
@@ -19,6 +20,15 @@ public class MainMenu : MonoBehaviour
     public void Close()
     {
         settingsPanel.SetActive(false);
+    }
+
+    public void Credits()
+    {
+        crreditsPanel.SetActive(true);
+    }
+    public void CloseCredits()
+    {
+        crreditsPanel.SetActive(false);
     }
 
     public void ExitGame()

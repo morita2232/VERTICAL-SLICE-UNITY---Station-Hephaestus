@@ -12,22 +12,26 @@ public class AlienInteraction : MonoBehaviour
     [TextArea] public string[] alienLines;       // original alien language lines
     [TextArea] public string[] translatedLines;  // human translations
 
-    /*
+
     [Header("Choice UI")]
     public GameObject choicePanel;
     public UnityEngine.UI.Button letGoButton;
     public UnityEngine.UI.Button disposeButton;
-    */
+    public GameObject crossHair;
+    public Movement playerMovement;
+    public HorizontalMovement horizontalLook;
+    public RotacionVertical verticalLook;
     private bool hasInteracted = false;
+    public endings endingScript;
 
     private void Start()
     {
-        /*
+
         choicePanel.SetActive(false);
 
         letGoButton.onClick.AddListener(() => Choose("letgo"));
         disposeButton.onClick.AddListener(() => Choose("dispose"));
-        */
+
     }
 
     public void Interact()
@@ -36,6 +40,22 @@ public class AlienInteraction : MonoBehaviour
             return;
 
         hasInteracted = true;
+        // Save & disable controls
+        if (playerMovement != null)
+        {
+
+            playerMovement.canMove = false;
+        }
+        if (horizontalLook != null)
+        {
+
+            horizontalLook.canMove = false;
+        }
+        if (verticalLook != null)
+        {
+
+            verticalLook.canRotate = false;
+        }
 
         // Begin the dual-language dialogue sequence
         StartCoroutine(PlayAlienDialogue());
@@ -70,38 +90,36 @@ public class AlienInteraction : MonoBehaviour
             yield return new WaitUntil(() => finished);
             DialogueManager.OnDialogueSequenceFinished -= Done2;
         }
-        /*
+
         // All dialogue done  show choices
+        crossHair.SetActive(false);
+        Cursor.lockState = CursorLockMode.None;
         choicePanel.SetActive(true);
-        */
+
     }
 
-    /*
+
     private void Choose(string option)
     {
         choicePanel.SetActive(false);
+        crossHair.SetActive(true);
+        Cursor.lockState = CursorLockMode.Locked;
 
         if (option == "letgo")
         {
-            DialogueManager.Instance.SayLines(
-                "Alien",
-                new string[]{
-                    "Thank you. I will leave now. My strawberries await me."
-                },
-                translationFont,
-                alienPortrait
-            );
+            endingScript.EndingOne();
         }
         else
         {
-            DialogueManager.Instance.SayLines(
-                "Spammy Sammy",
-                new string[]{
-                    "Correct decision, employee. The company appreciates your cooperation."
-                }
-            );
+            endingScript.EndingTwo();
         }
+        if (playerMovement != null)
+            playerMovement.canMove = true;
+        if (horizontalLook != null)
+            horizontalLook.canMove = true;
+        if (verticalLook != null)
+            verticalLook.canRotate = true;
     }
-    */
+
 }
 

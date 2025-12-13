@@ -9831,6 +9831,7 @@ MonoBehaviour:
   followDistance: 4
   moveSpeed: 4
   rotateSpeed: 10
+  interactLocator: {fileID: 0}
 --- !u!114 &1199440184
 MonoBehaviour:
   m_ObjectHideFlags: 0
