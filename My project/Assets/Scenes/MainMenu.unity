@@ -3036,6 +3036,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8768062489032443024, guid: 33c94abcaef1e2b4d8c2613055e1c2a2, type: 3}
+      propertyPath: m_Value
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8768062489032443024, guid: 33c94abcaef1e2b4d8c2613055e1c2a2, type: 3}
+      propertyPath: m_MaxValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8768062489032443024, guid: 33c94abcaef1e2b4d8c2613055e1c2a2, type: 3}
+      propertyPath: m_MinValue
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9040154816478400147, guid: 33c94abcaef1e2b4d8c2613055e1c2a2, type: 3}
       propertyPath: m_Name
       value: SETTINGS_PANEL

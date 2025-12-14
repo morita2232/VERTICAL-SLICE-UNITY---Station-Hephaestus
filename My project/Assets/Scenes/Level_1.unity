@@ -1594,10 +1594,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b613e60c221c244cb2203bc31c18696, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 169577836}
-  minBaseY: -1000
-  maxBaseY: 1000
+  player: {fileID: 169577842}
+  baseSensitivity: 1
   canMove: 1
+  deadzone: 0.002
 --- !u!114 &169577839
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10954,6 +10954,18 @@ PrefabInstance:
     - target: {fileID: 8649689725151992572, guid: 33c94abcaef1e2b4d8c2613055e1c2a2, type: 3}
       propertyPath: m_Layer
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8768062489032443024, guid: 33c94abcaef1e2b4d8c2613055e1c2a2, type: 3}
+      propertyPath: m_Value
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8768062489032443024, guid: 33c94abcaef1e2b4d8c2613055e1c2a2, type: 3}
+      propertyPath: m_MaxValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8768062489032443024, guid: 33c94abcaef1e2b4d8c2613055e1c2a2, type: 3}
+      propertyPath: m_MinValue
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9040154816478400147, guid: 33c94abcaef1e2b4d8c2613055e1c2a2, type: 3}
       propertyPath: m_Name

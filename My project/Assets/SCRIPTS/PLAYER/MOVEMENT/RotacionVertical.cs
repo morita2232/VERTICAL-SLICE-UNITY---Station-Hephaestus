@@ -45,23 +45,27 @@ public class RotacionVertical : MonoBehaviour
     {
         if (!canRotate) return;
 
-        // Always read latest sensitivity value
-        float sensitivity = PlayerPrefs.GetFloat("MouseSensitivity", 5.0f);
-
-        Debug.Log("Loaded MouseSensitivity from PlayerPrefs (Rotacion Vertical): " + sensitivity);
+        float slider = PlayerPrefs.GetFloat("MouseSensitivity", 0.5f);
+        float curved = slider * slider;
+        float sensitivity = Mathf.Lerp(0.1f, 8f, curved);
 
         Vector2 look = inputs.Player.Look.ReadValue<Vector2>();
 
         if (Mathf.Abs(look.y) < deadzone)
             return;
 
-        float deltaY = look.y * sensitivity * baseSensitivity;
+        float deltaY =
+            look.y *
+            sensitivity *
+            baseSensitivity *
+            Time.deltaTime;
 
         currentRotationX -= deltaY;
         currentRotationX = Mathf.Clamp(currentRotationX, minAngle, maxAngle);
 
         transform.localEulerAngles = new Vector3(currentRotationX, 0f, 0f);
     }
+
 
 
 

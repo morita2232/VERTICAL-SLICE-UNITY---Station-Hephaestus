@@ -4,40 +4,65 @@ using UnityEngine.InputSystem;
 public class HorizontalMovement : MonoBehaviour
 {
     [Header("References")]
-    public GameObject player;
+    public Transform player;
 
     [Header("Attributes")]
-    public float minBaseY = -60f;
-    public float maxBaseY = 60f;
+    public float baseSensitivity = 1f;
     public bool canMove = true;
 
-    private float RotationY = 0f;
-    private Transform TransformY;
+    InputSystem_Actions inputs;
+    float rotationY;
+    float sensitivity;
+
+    [Tooltip("Ignores tiny input to prevent drift")]
+    [Range(0f, 0.1f)]
+    public float deadzone = 0.002f;
 
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void OnEnable()
+    {
+        if (inputs == null)
+            inputs = new InputSystem_Actions();
+
+        inputs.Enable();
+    }
+
+    void OnDisable()
+    {
+        inputs.Disable();
+    }
+
     void Start()
     {
-        TransformY = player != null ? player.transform : null;
-        RotationY = TransformY.localEulerAngles.y;
+        rotationY = player.localEulerAngles.y;
+        sensitivity = PlayerPrefs.GetFloat("MouseSensitivity", 0.5f);
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (canMove)
-        {
+        if (!canMove) return;
 
-        Vector2 mouseDelta = Mouse.current.delta.value;
+        float slider = PlayerPrefs.GetFloat("MouseSensitivity", 0.5f);
+        float curved = slider * slider;
+        float sensitivity = Mathf.Lerp(0.1f, 8f, curved);
 
-        RotationY += mouseDelta.x;
+        Vector2 look = inputs.Player.Look.ReadValue<Vector2>();
+        Debug.Log(look);
 
-        RotationY = Mathf.Clamp(RotationY, minBaseY, maxBaseY);
+        if (Mathf.Abs(look.x) < deadzone)
+            return;
 
-        Vector3 euler = TransformY.localEulerAngles;
-        euler.y = RotationY;
-        TransformY.localEulerAngles = euler;
-        }
 
+        float delta =
+            look.x *
+            sensitivity *
+            baseSensitivity *
+            Time.deltaTime;
+
+        rotationY += delta;
+        player.localEulerAngles = new Vector3(0f, rotationY, 0f);
     }
+
+
 }
+
