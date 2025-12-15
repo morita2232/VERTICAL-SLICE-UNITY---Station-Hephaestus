@@ -1,29 +1,54 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// Controls plane tilting during the ball-balancing minigame.
+/// Reads keyboard input and smoothly rotates the plane
+/// around a fixed base rotation.
+/// </summary>
 public class PlaneMovement : MonoBehaviour
 {
-    public bool movePlane = false;
+    // ================================
+    // Minigame State
+    // ================================
 
-    private InputSystem_Actions inputs;
+    public bool movePlane = false;    // Enables or disables plane movement
 
-    public float maxTiltX = 25f;      // how far from baseX it tilts
-    public float smooth = 8f;         // how fast it moves toward target
 
-    // current rotation values
-    private float currentX;
-    private float currentY;
-    private float currentZ;
+    // ================================
+    // Input System
+    // ================================
 
-    // base X rotation (you said it's -90)
-    public float baseX = -90f;
+    private InputSystem_Actions inputs; // Generated Input System actions
+
+
+    // ================================
+    // Rotation Settings (Inspector)
+    // ================================
+
+    [Header("Rotation Settings")]
+
+    public float baseX = -90f;        // Base X rotation of the plane
+    public float maxTiltX = 25f;      // How far from baseX the plane can tilt
+    public float smooth = 8f;         // How fast the plane moves toward target rotation
+
+
+    // ================================
+    // Current Rotation State
+    // ================================
+
+    private float currentX;           // Current X rotation
+    private float currentY;           // Current Y rotation
+    private float currentZ;           // Current Z rotation
+
 
     void Start()
     {
+        // Initialize input system
         inputs = new InputSystem_Actions();
         inputs.Enable();
 
-        // start from whatever the object currently has
+        // Cache starting rotation
         Vector3 e = transform.eulerAngles;
         currentX = e.x;
         currentY = e.y;
@@ -38,53 +63,61 @@ public class PlaneMovement : MonoBehaviour
 
     void Update()
     {
+        // Do nothing if minigame is inactive
         if (!movePlane) return;
 
+        // Read keyboard input
         Keyboard kb = Keyboard.current;
         bool a = kb.aKey.isPressed;
         bool d = kb.dKey.isPressed;
         bool w = kb.wKey.isPressed;
         bool s = kb.sKey.isPressed;
 
-        // Default target = rest rotation
+        // Default target rotation (resting state)
         float targetX = baseX;
         float targetY = 0f;
         float targetZ = 0f;
 
-        // --- Apply your exact rules ---
+        // ================================
+        // Rotation Rules
+        // ================================
 
-        // D -> x+ & y = 90 & z = -90
+        // D key: tilt right
         if (d && !a && !w && !s)
         {
             targetX = baseX + maxTiltX;
             targetY = 90f;
             targetZ = -90f;
         }
-        // A -> x- & y = -90 & z = 90
+        // A key: tilt left
         else if (a && !d && !w && !s)
         {
             targetX = baseX + maxTiltX;
             targetY = -90f;
             targetZ = 90f;
         }
-        // W -> x+ & y = 0 & z = 0
+        // W key: tilt forward
         else if (w && !s && !a && !d)
         {
             targetX = baseX + maxTiltX;
             targetY = 0f;
             targetZ = 0f;
         }
-        // S -> x- & y = 0 & z = 0
+        // S key: tilt backward
         else if (s && !w && !a && !d)
         {
             targetX = baseX - maxTiltX;
             targetY = 0f;
             targetZ = 0f;
         }
-        // If multiple keys are pressed, you can decide priority here if you want.
+        // Multiple keys pressed  resting state (or add priority later)
 
-        // Smoothly move each axis toward target
+        // ================================
+        // Smooth Rotation
+        // ================================
+
         float t = smooth * Time.deltaTime;
+
         currentX = Mathf.LerpAngle(currentX, targetX, t);
         currentY = Mathf.LerpAngle(currentY, targetY, t);
         currentZ = Mathf.LerpAngle(currentZ, targetZ, t);
@@ -92,6 +125,7 @@ public class PlaneMovement : MonoBehaviour
         transform.rotation = Quaternion.Euler(currentX, currentY, currentZ);
     }
 }
+
 
 
 

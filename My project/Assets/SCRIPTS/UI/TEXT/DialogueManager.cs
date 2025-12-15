@@ -4,18 +4,45 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 
+/// <summary>
+/// Central controller for all dialogue sequences.
+/// Coordinates Fade display, line progression, skipping,
+/// and notifies listeners when a dialogue sequence ends.
+/// </summary>
 public class DialogueManager : MonoBehaviour
 {
+    // ================================
+    // Singleton
+    // ================================
+
     public static DialogueManager Instance;
 
-    public Fade fade;
 
-    //  Fired after the *whole* dialogue sequence is finished
-    // (all lines shown AND last one dismissed by player)
+    // ================================
+    // References
+    // ================================
+
+    public Fade fade;   // Handles dialogue UI and typewriter effect
+
+
+    // ================================
+    // Events
+    // ================================
+
+    /// <summary>
+    /// Fired after the entire dialogue sequence finishes
+    /// (all lines shown and last one dismissed or skipped).
+    /// </summary>
     public static event Action OnDialogueSequenceFinished;
 
-    // When true the active dialogue coroutines will treat this as a dismissal
+
+    // ================================
+    // Internal State
+    // ================================
+
+    // When true, active dialogue coroutines treat this as a dismissal
     private bool skipRequested = false;
+
 
     void Awake()
     {
@@ -24,37 +51,49 @@ public class DialogueManager : MonoBehaviour
 
     void Update()
     {
-        // Cheat key: skip current dialogue sequence
+        // Cheat key: skip the current dialogue sequence
         if (Input.GetKeyDown(KeyCode.F6))
         {
             RequestSkip();
         }
     }
 
-    // Public helper to request a skip from other scripts if needed
+    /// <summary>
+    /// Requests skipping the current dialogue sequence.
+    /// Can be called internally or by other scripts.
+    /// </summary>
     public void RequestSkip()
     {
-        // mark request
+        // Mark skip request
         skipRequested = true;
 
-        // immediately hide the panel so the player sees it disappear
+        // Immediately hide dialogue panel for instant feedback
         if (fade != null && fade.dialoguePanel != null && fade.dialoguePanel.activeSelf)
         {
             fade.dialoguePanel.SetActive(false);
         }
     }
 
-    // Single line
+    /// <summary>
+    /// Displays a single dialogue line.
+    /// </summary>
     public void Say(string speaker, string text, TMP_FontAsset font = null, Sprite portrait = null)
     {
         StartCoroutine(SayRoutine(speaker, text, font, portrait));
     }
 
-    // Multiple lines (for tutorials, conversations, etc.)
+    /// <summary>
+    /// Displays multiple dialogue lines sequentially.
+    /// </summary>
     public void SayLines(string speaker, string[] lines, TMP_FontAsset font = null, Sprite portrait = null)
     {
         StartCoroutine(SayLinesRoutine(speaker, lines, font, portrait));
     }
+
+
+    // ================================
+    // Coroutines
+    // ================================
 
     IEnumerator SayRoutine(string speaker, string text, TMP_FontAsset font, Sprite portrait)
     {
@@ -64,19 +103,19 @@ public class DialogueManager : MonoBehaviour
         fade.OnDismissed += HandleDismiss;
         fade.ShowText(speaker, text, font, portrait);
 
-        // Wait until either the player dismisses OR a skip was requested
+        // Wait until the player dismisses or a skip is requested
         yield return new WaitUntil(() => dismissed || skipRequested);
 
         fade.OnDismissed -= HandleDismiss;
 
-        // single line finished & clicked (or skipped) -> hide
+        // Hide dialogue panel after single line
         if (fade.dialoguePanel != null)
             fade.dialoguePanel.SetActive(false);
 
-        // If skip was requested, clear it now so future dialogues behave normally
+        // Reset skip flag for future dialogues
         skipRequested = false;
 
-        // notify listeners that the dialogue sequence is over
+        // Notify listeners that the dialogue sequence finished
         OnDialogueSequenceFinished?.Invoke();
     }
 
@@ -90,27 +129,28 @@ public class DialogueManager : MonoBehaviour
             fade.OnDismissed += HandleDismiss;
             fade.ShowText(speaker, line, font, portrait);
 
-            // wait until player clicks after the line is done typing OR skip requested
+            // Wait for dismissal or skip request
             yield return new WaitUntil(() => dismissed || skipRequested);
 
             fade.OnDismissed -= HandleDismiss;
 
-            // If skip was requested, stop showing the remaining lines
+            // If skip requested, stop showing remaining lines
             if (skipRequested)
                 break;
         }
 
-        // all lines done & last one clicked -> hide (or skipped)
+        // Hide dialogue panel after final line or skip
         if (fade.dialoguePanel != null)
             fade.dialoguePanel.SetActive(false);
 
-        // clear skip for future dialogues
+        // Reset skip flag for future dialogues
         skipRequested = false;
 
-        // notify listeners that the dialogue sequence is over
+        // Notify listeners that the dialogue sequence finished
         OnDialogueSequenceFinished?.Invoke();
     }
 }
+
 
 
 

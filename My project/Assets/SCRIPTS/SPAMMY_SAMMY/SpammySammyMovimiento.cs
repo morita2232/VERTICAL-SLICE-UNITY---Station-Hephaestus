@@ -1,16 +1,39 @@
 using UnityEngine;
 
+/// <summary>
+/// Controls Spammy Sammy's follow behavior.
+/// Sammy follows the player at a fixed distance, rotates to face them,
+/// and updates walking animations based on movement.
+/// </summary>
 public class SpammySammyMovimiento : MonoBehaviour
 {
-    public Transform playerPos;
-    public Animator animator;
+    // ================================
+    // References
+    // ================================
+
+    public Transform playerPos;            // Player transform to follow
+    public Animator animator;              // Animator controlling Sammy
+
+
+    // ================================
+    // Follow Settings
+    // ================================
 
     [Header("Follow Settings")]
-    public float followDistance = 2f;
-    public float moveSpeed = 4f;
-    public float rotateSpeed = 10f;
-    public InteractLocator interactLocator;
-    private Vector3 lastPosition;
+
+    public float followDistance = 2f;      // Desired distance from player
+    public float moveSpeed = 4f;            // Movement speed
+    public float rotateSpeed = 10f;         // Rotation smoothing speed
+
+    public InteractLocator interactLocator; // Used to stop following in spaceship
+
+
+    // ================================
+    // Internal State
+    // ================================
+
+    private Vector3 lastPosition;           // Used to detect movement for animation
+
 
     void Start()
     {
@@ -20,13 +43,24 @@ public class SpammySammyMovimiento : MonoBehaviour
     void Update()
     {
         if (!playerPos) return;
+
+        // Do not follow while player is inside the spaceship
         if (interactLocator.isInSpaceShip) return;
 
-        Vector3 playerFlat = new Vector3(playerPos.position.x, transform.position.y, playerPos.position.z);
+        // Flatten player position so Sammy stays on ground plane
+        Vector3 playerFlat = new Vector3(
+            playerPos.position.x,
+            transform.position.y,
+            playerPos.position.z
+        );
+
         Vector3 toPlayer = playerFlat - transform.position;
         float dist = toPlayer.magnitude;
 
-        // Follow logic (same as before, or your version)
+        // ================================
+        // Follow Movement
+        // ================================
+
         if (dist > followDistance)
         {
             Vector3 dir = toPlayer.normalized;
@@ -39,9 +73,14 @@ public class SpammySammyMovimiento : MonoBehaviour
             );
         }
 
+        // ================================
+        // Rotation
+        // ================================
+
         if (toPlayer.sqrMagnitude > 0.0001f)
         {
             Quaternion targetRot = Quaternion.LookRotation(toPlayer.normalized, Vector3.up);
+
             transform.rotation = Quaternion.Slerp(
                 transform.rotation,
                 targetRot,
@@ -49,20 +88,23 @@ public class SpammySammyMovimiento : MonoBehaviour
             );
         }
 
-        // ---- ANIMATION: use a bool instead of float threshold ----
+        // ================================
+        // Animation
+        // ================================
+
         if (animator != null)
         {
             float movedSqr = (transform.position - lastPosition).sqrMagnitude;
-            bool isWalking = movedSqr > 0.00001f;  // tiny value, just "did he move?"
+
+            // Simple movement check: did Sammy move this frame?
+            bool isWalking = movedSqr > 0.00001f;
 
             animator.SetBool("IsWalking", isWalking);
-
-            // Debug if you want:
-            // Debug.Log("Sammy IsWalking = " + isWalking + " (movedSqr = " + movedSqr + ")");
         }
 
         lastPosition = transform.position;
     }
 }
+
 
 

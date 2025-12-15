@@ -1,18 +1,34 @@
 using UnityEngine;
 
+/// <summary>
+/// Displays an interaction popup when the player
+/// is able to interact with this object.
+/// </summary>
 public class Interactable : MonoBehaviour
 {
-    [Header("Pop up attributes")]
-    public GameObject interactPopUp;
-    public Vector3 offsetFromCamera = new Vector3(0, 1f, 2.5f); // adjustable offset
-    private Transform cam;
+    // ================================
+    // Popup Display Settings
+    // ================================
 
+    [Header("Pop up attributes")]
+
+    public GameObject interactPopUp;          // UI element shown when interaction is possible
+    public Vector3 offsetFromCamera = new Vector3(0, 1f, 2.5f); // Adjustable popup offset
+    private Transform cam;                    // Cached main camera transform
+
+
+    // ================================
+    // Interaction Reference
+    // ================================
 
     [Header("Script references")]
-    public InteractLocator interactLocator;
+
+    public InteractLocator interactLocator;   // Tracks whether interaction is allowed
+
 
     private void Start()
     {
+        // Cache main camera
         cam = Camera.main != null ? Camera.main.transform : null;
 
         if (cam == null)
@@ -20,9 +36,10 @@ public class Interactable : MonoBehaviour
             Debug.LogError("No Camera with tag 'MainCamera' found in the scene.");
         }
 
+        // Start with popup hidden
         if (interactPopUp != null)
         {
-            interactPopUp.SetActive(false); // start hidden
+            interactPopUp.SetActive(false);
         }
     }
 
@@ -31,12 +48,11 @@ public class Interactable : MonoBehaviour
         if (interactPopUp == null || cam == null || interactLocator == null)
             return;
 
-        // Show / hide based on canInteract
+        // Show or hide popup based on interaction state
         if (interactLocator.canInteract)
         {
             if (!interactPopUp.activeSelf)
                 interactPopUp.SetActive(true);
-      
         }
         else
         {
@@ -45,6 +61,7 @@ public class Interactable : MonoBehaviour
         }
     }
 }
+
 
 
 

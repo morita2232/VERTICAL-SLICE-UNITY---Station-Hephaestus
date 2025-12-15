@@ -1,38 +1,72 @@
 using UnityEngine;
 
+/// <summary>
+/// Represents a ball-balance puzzle object in the world.
+/// Handles interaction, ambient broken sounds, visual feedback,
+/// and completion state.
+/// </summary>
 public class BallBalanceObject : MonoBehaviour
 {
-    [Header("Script references")]
-    public BallBalancingManager manager;
+    // ================================
+    // Script References
+    // ================================
 
-    [Header("Object attributes")]
-    public bool completed;
-    public ParticleSystem activeParticles;
-    public AudioSource sfxSource;
-    public AudioClip completionSfx;
-    public AudioClip brokenSfx;
+    [Header("Script References")]
+
+    public BallBalancingManager manager;   // Ball balancing minigame manager
+
+
+    // ================================
+    // Object State & Visual Feedback
+    // ================================
+
+    [Header("Object Attributes")]
+
+    public bool completed;                 // Whether this puzzle is completed
+    public ParticleSystem activeParticles; // Visual indicator while broken
+
+    public AudioSource sfxSource;           // Audio source for ambient & completion sounds
+    public AudioClip completionSfx;         // Played once when completed
+    public AudioClip brokenSfx;             // Looping sound while broken
+
+
+    // ================================
+    // Distance-Based Audio Settings
+    // ================================
 
     [Header("Distance Settings")]
-    public float hearRange = 5f;      // distance at which broken SFX starts
-    private Transform player;         // reference to player
-    private bool isBrokenSoundPlaying = false;
+
+    public float hearRange = 5f;            // Distance at which broken SFX is audible
+
+
+    // ================================
+    // Internal State
+    // ================================
+
+    private Transform player;               // Cached player transform
+    private bool isBrokenSoundPlaying = false; // Tracks ambient sound state
+
 
     void Start()
     {
+        // Cache player reference
         player = GameObject.FindGameObjectWithTag("Player").transform;
 
+        // Play visual feedback if not completed
         if (!completed && activeParticles != null)
             activeParticles.Play();
 
-        // DO NOT play the sound here anymore, wait for Update()
+        // Prepare audio source (do not auto-play)
         if (sfxSource != null)
         {
             sfxSource.loop = true;
             sfxSource.playOnAwake = false;
         }
     }
+
     void Update()
     {
+        // Skip if already completed or audio not set up
         if (completed || sfxSource == null || brokenSfx == null)
             return;
 
@@ -40,7 +74,7 @@ public class BallBalanceObject : MonoBehaviour
 
         if (distance <= hearRange)
         {
-            // Player is close enough to hear
+            // Player is close enough to hear broken sound
             if (!isBrokenSoundPlaying)
             {
                 sfxSource.clip = brokenSfx;
@@ -50,7 +84,7 @@ public class BallBalanceObject : MonoBehaviour
         }
         else
         {
-            // Player is too far away
+            // Player moved out of range
             if (isBrokenSoundPlaying)
             {
                 sfxSource.Stop();
@@ -58,6 +92,10 @@ public class BallBalanceObject : MonoBehaviour
             }
         }
     }
+
+    /// <summary>
+    /// Called when the player interacts with this puzzle object
+    /// </summary>
     public void Interact()
     {
         if (completed)
@@ -67,26 +105,31 @@ public class BallBalanceObject : MonoBehaviour
         }
 
         manager.OpenForObject(this);
-
     }
 
+    /// <summary>
+    /// Marks the ball balancing puzzle as completed
+    /// </summary>
     public void MarkCompleted()
     {
         completed = true;
+
         Debug.Log(name + ": conduit puzzle completed!");
 
+        // Stop visual feedback
         if (activeParticles != null)
             activeParticles.Stop();
 
-        // Stop broken sounds immediately
+        // Stop broken ambient sound immediately
         if (sfxSource != null)
         {
             sfxSource.Stop();
             isBrokenSoundPlaying = false;
         }
 
-        // Play completion SFX once
+        // Play completion sound once
         if (sfxSource != null && completionSfx != null)
             sfxSource.PlayOneShot(completionSfx);
     }
 }
+

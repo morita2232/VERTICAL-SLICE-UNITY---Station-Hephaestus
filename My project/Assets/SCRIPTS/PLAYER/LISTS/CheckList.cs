@@ -4,17 +4,45 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+/// <summary>
+/// Displays and tracks all remaining objectives in the level:
+/// - Puzzle objects (wires, ball balance, conduits)
+/// - Dirt cleaning
+/// - Trash disposal
+/// Triggers tutorial completion and level transition when finished.
+/// </summary>
 public class CheckList : MonoBehaviour
 {
+    // ================================
+    // World Object References (Auto-Filled)
+    // ================================
+
     private WireComputer[] wireComputers;
     private BallBalanceObject[] balanceObjects;
     private ConduitObject[] conduitObjects;
     private GameObject[] dirt;
     private GameObject[] trash;
+
+
+    // ================================
+    // Dialogue Assets
+    // ================================
+
     public TMP_FontAsset sammyFont;
     public Sprite sammyPortrait;
-    public bool isTutorial = false;
-    private bool finished = false;
+
+
+    // ================================
+    // Checklist State
+    // ================================
+
+    public bool isTutorial = false;   // Whether this checklist belongs to tutorial
+    private bool finished = false;    // Prevents multiple completions
+
+
+    // ================================
+    // Counters (Runtime)
+    // ================================
 
     public int allDirt = 0;
     public int remaining = 0;
@@ -22,29 +50,47 @@ public class CheckList : MonoBehaviour
     public int allTrash = 0;
     public int remainingTrash = 0;
 
+
+    // ================================
+    // UI Layout Settings
+    // ================================
+
     [Header("Attributes")]
-    public Vector2 uiOffset = new Vector2(10f, 10f);
-    public Vector2 uiSize = new Vector2(250f, 200f);
+
+    public Vector2 uiOffset = new Vector2(10f, 10f);   // Top-left offset
+    public Vector2 uiSize = new Vector2(250f, 200f);   // UI box size
+
+
+    // ================================
+    // Loading Screen
+    // ================================
 
     [Header("Loading Screen")]
+
     public GameObject loadingScreen;
     public Slider loadingBar;
 
+
     void Awake()
     {
-        if(SceneManager.GetActiveScene().name == "Tutorial") {
+        // Detect tutorial scene
+        if (SceneManager.GetActiveScene().name == "Tutorial")
+        {
             isTutorial = true;
         }
+
+        // Cache all relevant objects in the scene
         wireComputers = FindObjectsByType<WireComputer>(FindObjectsSortMode.None);
         balanceObjects = FindObjectsByType<BallBalanceObject>(FindObjectsSortMode.None);
         conduitObjects = FindObjectsByType<ConduitObject>(FindObjectsSortMode.None);
+
         dirt = GameObject.FindGameObjectsWithTag("Dirt");
         trash = GameObject.FindGameObjectsWithTag("Trash");
     }
 
     void OnGUI()
     {
-        //// IMPORTANT: reset counters each draw
+        // IMPORTANT: reset counters every draw
         remaining = 0;
         remainingTrash = 0;
         allTrash = 0;
@@ -55,7 +101,10 @@ public class CheckList : MonoBehaviour
 
         GUILayout.Label("Checklist");
 
-        // Wire computers
+        // ================================
+        // Wire Computers
+        // ================================
+
         if (wireComputers != null)
         {
             foreach (var comp in wireComputers)
@@ -70,7 +119,10 @@ public class CheckList : MonoBehaviour
             }
         }
 
-        // Ball balance objects
+        // ================================
+        // Ball Balance Objects
+        // ================================
+
         if (balanceObjects != null)
         {
             foreach (var obj in balanceObjects)
@@ -85,7 +137,10 @@ public class CheckList : MonoBehaviour
             }
         }
 
-        // Conduit objects
+        // ================================
+        // Conduit Objects
+        // ================================
+
         if (conduitObjects != null)
         {
             foreach (var obj in conduitObjects)
@@ -100,7 +155,10 @@ public class CheckList : MonoBehaviour
             }
         }
 
+        // ================================
         // Dirt
+        // ================================
+
         if (dirt != null)
         {
             foreach (var obj in dirt)
@@ -113,12 +171,16 @@ public class CheckList : MonoBehaviour
                     remaining++;
                 }
             }
+
             if (allDirt > 0)
             {
-                 GUILayout.Label("• Clean " + allDirt);
-
+                GUILayout.Label("• Clean " + allDirt);
             }
         }
+
+        // ================================
+        // Trash
+        // ================================
 
         if (trash != null)
         {
@@ -134,24 +196,28 @@ public class CheckList : MonoBehaviour
                     remaining++;
                 }
             }
+
             if (allTrash > 0)
             {
                 GUILayout.Label("• Dispose " + allTrash);
             }
         }
 
-            // Summary
-            GUILayout.Space(5);
+        // ================================
+        // Summary
+        // ================================
+
+        GUILayout.Space(5);
 
         if (remaining <= 0)
         {
             GUILayout.Label("All tasks complete!");
+
             if (!finished)
             {
                 finito();
                 finished = true;
             }
-
         }
         else
         {
@@ -160,56 +226,62 @@ public class CheckList : MonoBehaviour
 
         GUILayout.EndArea();
     }
-    
+
+    /// <summary>
+    /// Called once when all checklist tasks are completed
+    /// </summary>
     void finito()
     {
         if (isTutorial)
         {
-
             DialogueManager.OnDialogueSequenceFinished += LoadNextLevel;
+
             DialogueManager.Instance.SayLines(
                 "Spammy Sammy",
                 new string[]
                 {
-                        "Now that you know the basics you are ready to work for our great bosses!!!.",
-                        "GOOD LUCK OUT THERE!!!"
-                }, sammyFont, sammyPortrait
+                    "Now that you know the basics you are ready to work for our great bosses!!!.",
+                    "GOOD LUCK OUT THERE!!!"
+                },
+                sammyFont,
+                sammyPortrait
             );
         }
     }
 
+    /// <summary>
+    /// Loads the next level after dialogue finishes
+    /// </summary>
     void LoadNextLevel()
     {
-        // Desuscribirse para que solo se llame una vez
+        // Unsubscribe so it runs only once
         DialogueManager.OnDialogueSequenceFinished -= LoadNextLevel;
 
-        // Empezar la carga asíncrona con pantalla de carga
+        // Start async load with loading screen
         StartCoroutine(LoadSceneAsynchronously("Level_1"));
     }
 
-
-
+    /// <summary>
+    /// Asynchronously loads a scene while updating a loading bar
+    /// </summary>
     IEnumerator LoadSceneAsynchronously(string sceneName)
     {
         loadingScreen.SetActive(true);
 
         AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
-        operation.allowSceneActivation = true;   // opcional, por si luego quieres hacer cosas fancy
+        operation.allowSceneActivation = true;
 
         while (!operation.isDone)
         {
-            // Opcional: normalizar a 0–1 porque progress llega solo hasta 0.9
+            // Normalize progress (Unity stops at 0.9)
             float progress = Mathf.Clamp01(operation.progress / 0.9f);
             loadingBar.value = progress;
-
-            // Debug para ver cuánto va cargando
-            // Debug.Log(progress);
 
             yield return null;
         }
     }
-
 }
+
 
 
 

@@ -1,20 +1,46 @@
 using UnityEngine;
 
+/// <summary>
+/// Simulates a decorative spaceship that moves inside a bounded area,
+/// wraps around the edges, and continuously performs a barrel roll.
+/// Used purely for visual background motion.
+/// </summary>
 public class FakeSpaceShip : MonoBehaviour
 {
+    // ================================
+    // Movement Settings
+    // ================================
+
     [Header("Movement")]
-    public float speed = 1.5f;          // how fast it moves
-    public BoxCollider area;            // drag your Limits collider here
+
+    public float speed = 1.5f;       // How fast the ship moves
+    public BoxCollider area;          // Bounds the ship can move within
+
+
+    // ================================
+    // Barrel Roll Settings
+    // ================================
 
     [Header("Barrel Roll")]
-    public float rollSpeed = 90f;       // degrees per second
 
-    private Vector3 direction;          // current movement direction (XY plane)
-    private float rollAngle;            // current barrel roll angle
+    public float rollSpeed = 90f;     // Degrees per second
+
+
+    // ================================
+    // Internal State
+    // ================================
+
+    private Vector3 direction;        // Current movement direction (XY plane)
+    private float rollAngle;          // Accumulated barrel roll angle
+
 
     void Start()
     {
-        // ----- Random spawn position (z = 0) inside the area -----
+        // ================================
+        // Random Spawn Position
+        // ================================
+
+        // Spawn inside the defined area (Z forced to 0)
         if (area != null)
         {
             Bounds b = area.bounds;
@@ -26,13 +52,19 @@ public class FakeSpaceShip : MonoBehaviour
         }
         else
         {
+            // Fallback: force Z position to 0
             Vector3 p = transform.position;
             p.z = 0f;
             transform.position = p;
         }
 
-        // ----- Random 2D direction -----
+        // ================================
+        // Random Initial Direction
+        // ================================
+
         Vector2 dir2 = Random.insideUnitCircle;
+
+        // Safety: avoid near-zero vectors
         if (dir2.sqrMagnitude < 0.001f)
             dir2 = Vector2.right;
 
@@ -41,10 +73,16 @@ public class FakeSpaceShip : MonoBehaviour
 
     void Update()
     {
-        // ----- 1) Move -----
+        // ================================
+        // 1) Movement
+        // ================================
+
         transform.position += direction * speed * Time.deltaTime;
 
-        // ----- 2) Wrap around the BoxCollider -----
+        // ================================
+        // 2) Wrap Around Bounds
+        // ================================
+
         Bounds b = area.bounds;
         Vector3 pos = transform.position;
         bool wrapped = false;
@@ -58,7 +96,7 @@ public class FakeSpaceShip : MonoBehaviour
         pos.z = 0f;
         transform.position = pos;
 
-        // Optional: when we wrap, pick a new random direction
+        // When wrapping, choose a new random direction
         if (wrapped)
         {
             Vector2 dir2 = Random.insideUnitCircle;
@@ -68,17 +106,24 @@ public class FakeSpaceShip : MonoBehaviour
             direction = new Vector3(dir2.x, dir2.y, 0f).normalized;
         }
 
-        // ----- 3) Rotate so nose points along movement -----
-        // Assumes the ship’s nose points along local +X in the model.
+        // ================================
+        // 3) Face Movement Direction
+        // ================================
+
+        // Assumes the ship model faces +X locally
         Quaternion faceDir = Quaternion.FromToRotation(Vector3.right, direction);
 
-        // ----- 4) Barrel roll around the nose direction -----
+        // ================================
+        // 4) Barrel Roll
+        // ================================
+
         rollAngle += rollSpeed * Time.deltaTime;
         Quaternion roll = Quaternion.AngleAxis(rollAngle, direction);
 
         transform.rotation = roll * faceDir;
     }
 }
+
 
 
 

@@ -1,31 +1,69 @@
 using UnityEngine;
 
+/// <summary>
+/// Manages the conduit charging puzzle:
+/// - Disables player controls
+/// - Handles tube selection and activation
+/// - Checks for puzzle completion
+/// - Restores gameplay when finished
+/// </summary>
 public class ConduitManager : MonoBehaviour
 {
-    private ConduitObject currentOwner;
+    // ================================
+    // Puzzle Owner
+    // ================================
+
+    private ConduitObject currentOwner;   // Object that triggered the puzzle
+
+
+    // ================================
+    // Player & Interaction References
+    // ================================
 
     [Header("Cameras / Player")]
-    public InteractLocator playerInteractLocator;
 
-    public HorizontalMovement playerHorizontalMovement;
-    public Movement playerMovement;
-    public RotacionVertical playerVerticalMovement;
+    public InteractLocator playerInteractLocator; // Tracks minigame state
+
+    public HorizontalMovement playerHorizontalMovement; // Horizontal look control
+    public Movement playerMovement;                     // Player movement
+    public RotacionVertical playerVerticalMovement;     // Vertical look control
+
+
+    // ================================
+    // Conduit Puzzle Setup
+    // ================================
 
     [Header("Conduit Puzzle")]
-    public ConduitTube[] tubes;
+
+    public ConduitTube[] tubes;           // All conduit tubes in the puzzle
+
+
+    // ================================
+    // Input Keys
+    // ================================
 
     [Header("Input")]
-    public KeyCode startKey = KeyCode.E;
-    public KeyCode prevTubeKey = KeyCode.S; 
-    public KeyCode nextTubeKey = KeyCode.W;
-    public KeyCode exitKey = KeyCode.Q; 
 
-    public bool solved { get; private set; }
+    public KeyCode startKey = KeyCode.E;   // Start puzzle / activate first tube
+    public KeyCode prevTubeKey = KeyCode.S; // Select previous tube
+    public KeyCode nextTubeKey = KeyCode.W; // Select next tube
+    public KeyCode exitKey = KeyCode.Q;    // Exit puzzle
 
-    int activeIndex = 0;
-    bool puzzleStarted = false;
-    bool isMinigameOpen = false;
 
+    // ================================
+    // Puzzle State
+    // ================================
+
+    public bool solved { get; private set; } // True once puzzle is completed
+
+    int activeIndex = 0;                     // Currently active tube index
+    bool puzzleStarted = false;              // Whether charging has begun
+    bool isMinigameOpen = false;              // Whether the puzzle is active
+
+
+    /// <summary>
+    /// Opens the conduit puzzle for a specific object
+    /// </summary>
     public void OpenForObject(ConduitObject owner)
     {
         currentOwner = owner;
@@ -36,6 +74,7 @@ public class ConduitManager : MonoBehaviour
         puzzleStarted = false;
         activeIndex = 0;
 
+        // Reset all tubes
         if (tubes != null)
         {
             for (int i = 0; i < tubes.Length; i++)
@@ -44,27 +83,22 @@ public class ConduitManager : MonoBehaviour
                 tubes[i].ResetTube();
             }
         }
+
         Debug.Log("Conduit tubes reset.");
 
+        // Ensure no tube is charging yet
         SetActiveTube(activeIndex, false);
 
         Debug.Log("Press " + startKey + " to start the conduit puzzle.");
 
+        // Lock player controls
         playerInteractLocator.isInminigame = true;
 
-        Debug.Log("Player controls disabled.");
-
         playerMovement.canMove = false;
-
-        Debug.Log("Player movement disabled.");
-
         playerHorizontalMovement.canMove = false;
-
-        Debug.Log("Player horizontal movement disabled.");
-
         playerVerticalMovement.canRotate = false;
 
-        Debug.Log("Player vertical movement disabled.");
+        Debug.Log("Player controls disabled.");
 
         isMinigameOpen = true;
 
@@ -75,6 +109,7 @@ public class ConduitManager : MonoBehaviour
     {
         if (!isMinigameOpen) return;
 
+        // Exit puzzle
         if (Input.GetKeyDown(exitKey))
         {
             EndMinigame();
@@ -87,15 +122,15 @@ public class ConduitManager : MonoBehaviour
         CheckSolved();
     }
 
+    /// <summary>
+    /// Handles player input for starting and switching tubes
+    /// </summary>
     void HandlePuzzleInput()
     {
         if (!puzzleStarted)
         {
-            
-            
-                puzzleStarted = true;
-                SetActiveTube(activeIndex, true);
-            
+            puzzleStarted = true;
+            SetActiveTube(activeIndex, true);
             return;
         }
 
@@ -116,6 +151,9 @@ public class ConduitManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Switches which tube is currently charging
+    /// </summary>
     void SwitchActiveTube(int newIndex)
     {
         if (tubes == null || tubes.Length == 0) return;
@@ -129,6 +167,9 @@ public class ConduitManager : MonoBehaviour
             tubes[activeIndex].SetActive(true);
     }
 
+    /// <summary>
+    /// Sets the active tube and optionally starts charging it
+    /// </summary>
     void SetActiveTube(int index, bool shouldCharge)
     {
         if (tubes == null || tubes.Length == 0) return;
@@ -144,6 +185,9 @@ public class ConduitManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Checks whether all tubes are within their target ranges
+    /// </summary>
     void CheckSolved()
     {
         if (tubes == null || tubes.Length == 0) return;
@@ -158,6 +202,9 @@ public class ConduitManager : MonoBehaviour
         OnSolved();
     }
 
+    /// <summary>
+    /// Called when the puzzle is successfully solved
+    /// </summary>
     void OnSolved()
     {
         Debug.Log("Conduit puzzle solved!");
@@ -168,11 +215,14 @@ public class ConduitManager : MonoBehaviour
         EndMinigame();
     }
 
+    /// <summary>
+    /// Ends the minigame and restores player control
+    /// </summary>
     void EndMinigame()
     {
         isMinigameOpen = false;
 
-      
+        // Stop all tubes from charging
         if (tubes != null)
         {
             foreach (var t in tubes)
@@ -182,9 +232,11 @@ public class ConduitManager : MonoBehaviour
             }
         }
 
+        // Restore interaction state
         if (playerInteractLocator != null)
             playerInteractLocator.isInminigame = false;
 
+        // Restore player controls
         if (playerMovement != null) playerMovement.canMove = true;
         if (playerHorizontalMovement != null) playerHorizontalMovement.canMove = true;
         if (playerVerticalMovement != null) playerVerticalMovement.canRotate = true;
@@ -194,5 +246,6 @@ public class ConduitManager : MonoBehaviour
         Debug.Log("Conduit minigame closed.");
     }
 }
+
 
 

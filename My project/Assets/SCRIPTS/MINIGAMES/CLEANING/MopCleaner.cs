@@ -1,25 +1,45 @@
 using UnityEngine;
 
+/// <summary>
+/// Handles cleaning behavior for the mop:
+/// - Shrinks and removes dirt objects
+/// - Cleans shader-based surfaces
+/// - Requires the mop to be moving to clean
+/// </summary>
 public class MopCleaner : MonoBehaviour
 {
+    // ================================
+    // Cleaning Settings
+    // ================================
+
     [Header("Cleaning Settings")]
-    public float shrinkRate = 0.5f;         // units of scale per second (for dirt)
-    public float minScaleToDestroy = 0.1f;  // destroy when smaller than this
-    public float minMoveSpeed = 0.1f;       // how fast the mop must move to clean
 
-    public float surfaceCleanRate = 0.2f;   // how fast Shader “Slide” increases
+    public float shrinkRate = 0.5f;         // Units of scale reduced per second (dirt)
+    public float minScaleToDestroy = 0.1f;  // Destroy dirt when smaller than this
+    public float minMoveSpeed = 0.1f;       // Mop must move at least this fast to clean
 
-    public CheckList checklist; // assign Checklist in inspector
-    private Vector3 lastPosition;
-    private float currentSpeed;
+    public float surfaceCleanRate = 0.2f;   // How fast shader "Slide" increases
+
+
+    // ================================
+    // Checklist & State
+    // ================================
+
+    public CheckList checklist;              // Checklist reference (assigned in Inspector)
+
+    private Vector3 lastPosition;            // Position last frame
+    private float currentSpeed;              // Calculated movement speed
+
 
     void Start()
     {
+        // Initialize last position
         lastPosition = transform.position;
     }
 
     void Update()
     {
+        // Calculate movement speed
         Vector3 delta = transform.position - lastPosition;
         currentSpeed = delta.magnitude / Time.deltaTime;
         lastPosition = transform.position;
@@ -27,11 +47,14 @@ public class MopCleaner : MonoBehaviour
 
     void OnTriggerStay(Collider other)
     {
-        // Mop must be moving
+        // Mop must be moving to clean
         if (currentSpeed < minMoveSpeed)
             return;
 
-        // ----- 1) Old: shrink DIRT objects -----
+        // ================================
+        // 1) Shrink & Remove Dirt Objects
+        // ================================
+
         if (other.CompareTag("Dirt"))
         {
             Transform dirt = other.transform;
@@ -53,7 +76,10 @@ public class MopCleaner : MonoBehaviour
             return;
         }
 
-        // ----- 2) New: clean Shader on surfaces -----
+        // ================================
+        // 2) Clean Shader-Based Surfaces
+        // ================================
+
         CleanableSurface surface = other.GetComponent<CleanableSurface>();
         if (surface != null)
         {

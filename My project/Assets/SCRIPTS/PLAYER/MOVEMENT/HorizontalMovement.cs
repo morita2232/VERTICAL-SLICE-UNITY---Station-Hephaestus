@@ -1,22 +1,42 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// Handles horizontal (Y-axis) player rotation using the Input System.
+/// Sensitivity is read from PlayerPrefs and supports a configurable deadzone.
+/// </summary>
 public class HorizontalMovement : MonoBehaviour
 {
+    // ================================
+    // References
+    // ================================
+
     [Header("References")]
-    public Transform player;
+
+    public Transform player;              // Player transform to rotate
+
+
+    // ================================
+    // Rotation Settings
+    // ================================
 
     [Header("Attributes")]
-    public float baseSensitivity = 1f;
-    public bool canMove = true;
 
-    InputSystem_Actions inputs;
-    float rotationY;
-    float sensitivity;
+    public float baseSensitivity = 1f;    // Base multiplier for mouse sensitivity
+    public bool canMove = true;           // Whether horizontal look is allowed
 
     [Tooltip("Ignores tiny input to prevent drift")]
     [Range(0f, 0.1f)]
-    public float deadzone = 0.002f;
+    public float deadzone = 0.002f;       // Minimum input threshold
+
+
+    // ================================
+    // Internal State
+    // ================================
+
+    InputSystem_Actions inputs;           // Generated input actions
+    float rotationY;                      // Current Y rotation
+    float sensitivity;                    // Cached sensitivity value
 
 
     void OnEnable()
@@ -34,7 +54,10 @@ public class HorizontalMovement : MonoBehaviour
 
     void Start()
     {
+        // Initialize rotation from player
         rotationY = player.localEulerAngles.y;
+
+        // Load initial sensitivity
         sensitivity = PlayerPrefs.GetFloat("MouseSensitivity", 0.5f);
     }
 
@@ -42,17 +65,20 @@ public class HorizontalMovement : MonoBehaviour
     {
         if (!canMove) return;
 
+        // Read sensitivity from PlayerPrefs each frame (supports live changes)
         float slider = PlayerPrefs.GetFloat("MouseSensitivity", 0.5f);
         float curved = slider * slider;
         float sensitivity = Mathf.Lerp(0.1f, 8f, curved);
 
+        // Read look input
         Vector2 look = inputs.Player.Look.ReadValue<Vector2>();
         Debug.Log(look);
 
+        // Ignore tiny input to prevent drift
         if (Mathf.Abs(look.x) < deadzone)
             return;
 
-
+        // Calculate rotation delta
         float delta =
             look.x *
             sensitivity *
@@ -60,9 +86,10 @@ public class HorizontalMovement : MonoBehaviour
             Time.deltaTime;
 
         rotationY += delta;
+
+        // Apply rotation to player
         player.localEulerAngles = new Vector3(0f, rotationY, 0f);
     }
-
-
 }
+
 

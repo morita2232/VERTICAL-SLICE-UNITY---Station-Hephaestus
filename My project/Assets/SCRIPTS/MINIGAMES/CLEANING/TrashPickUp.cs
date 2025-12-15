@@ -1,33 +1,58 @@
 using UnityEngine;
 using TMPro; // only needed if you supply a TMP font to DialogueManager
 
+/// <summary>
+/// Allows the player to pick up, drop, and throw trash objects.
+/// Also plays a one-time dialogue the first time trash is picked up.
+/// </summary>
 public class TrashPickup : MonoBehaviour
 {
+    // ================================
+    // Pickup & Throw Settings
+    // ================================
+
     [Header("Pickup / Throw")]
-    public float pickUpRange = 3f;
-    public float throwForce = 10f; // tuned as impulse (try ~5-20)
-    public Transform holdParent;   // usually your camera transform (optional; auto-find if null)
-    public Vector3 holdLocalPosition = new Vector3(0f, -0.2f, 2f);
-    public Vector3 holdLocalRotation = Vector3.zero;
+
+    public float pickUpRange = 3f;          // Max distance to pick up trash
+    public float throwForce = 10f;           // Force applied when throwing (impulse)
+    public Transform holdParent;             // Usually the camera transform
+    public Vector3 holdLocalPosition = new Vector3(0f, -0.2f, 2f); // Held position
+    public Vector3 holdLocalRotation = Vector3.zero;              // Held rotation
+
+
+    // ================================
+    // One-Time Pickup Dialogue
+    // ================================
 
     [Header("One-time pickup dialogue")]
-    public TMP_FontAsset sammyFont;    // optional; pass to DialogueManager if used
-    public Sprite sammyPortrait;      // optional
-    public string[] pickupLines;
 
-    // static so it triggers only once per play session across all trash instances
+    public TMP_FontAsset sammyFont;          // Optional dialogue font
+    public Sprite sammyPortrait;             // Optional dialogue portrait
+    public string[] pickupLines;              // Dialogue lines played once
+
+
+    // ================================
+    // Internal State
+    // ================================
+
+    // Static so dialogue triggers only once across all trash objects
     private static bool hasShownPickupDialogue = false;
 
-    private Camera cam;
-    private Rigidbody rb;
-    private bool isHeld = false;
+    private Camera cam;                       // Cached main camera
+    private Rigidbody rb;                     // Rigidbody on this trash object
+    private bool isHeld = false;              // Whether the trash is currently held
+
 
     void Start()
     {
+        // Cache camera
         cam = Camera.main;
+
+        // Auto-assign hold parent if not set
         if (holdParent == null && cam != null)
             holdParent = cam.transform;
 
+        // Cache rigidbody
         rb = GetComponent<Rigidbody>();
         if (rb == null)
             Debug.LogWarning($"{name}: Rigidbody missing — add one for proper physics.");
@@ -35,6 +60,7 @@ public class TrashPickup : MonoBehaviour
 
     void Update()
     {
+        // Pick up / drop
         if (Input.GetKeyDown(KeyCode.E))
         {
             if (!isHeld)
@@ -43,12 +69,16 @@ public class TrashPickup : MonoBehaviour
                 DropTrash();
         }
 
+        // Throw while holding
         if (Input.GetKeyDown(KeyCode.G) && isHeld)
         {
             ThrowTrash();
         }
     }
 
+    /// <summary>
+    /// Attempts to pick up the trash using a camera raycast
+    /// </summary>
     void TryPickUp()
     {
         if (cam == null) return;
@@ -63,31 +93,32 @@ public class TrashPickup : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Picks up and holds the trash object
+    /// </summary>
     void PickUp()
     {
         isHeld = true;
 
-        // disable physics while held to avoid teleport tunneling
+        // Disable physics while held
         if (rb != null)
         {
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
             rb.isKinematic = true;
             rb.freezeRotation = true;
-            // keep collision detection default (no need for Continuous while kinematic)
         }
 
-        // parent to camera so it follows smoothly and collides correctly when dropped
+        // Parent to camera for smooth movement
         transform.SetParent(holdParent);
         transform.localPosition = holdLocalPosition;
         transform.localEulerAngles = holdLocalRotation;
 
-        // Play the one-time pickup dialogue (only first trash picked)
+        // Play pickup dialogue only once per session
         if (!hasShownPickupDialogue)
         {
             hasShownPickupDialogue = true;
 
-            // Use your existing DialogueManager (no changes required)
             if (DialogueManager.Instance != null)
             {
                 DialogueManager.Instance.SayLines(
@@ -104,11 +135,14 @@ public class TrashPickup : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Drops the trash object without force
+    /// </summary>
     void DropTrash()
     {
         isHeld = false;
 
-        // unparent and re-enable physics
+        // Unparent and re-enable physics
         transform.SetParent(null);
 
         if (rb != null)
@@ -119,11 +153,14 @@ public class TrashPickup : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Throws the trash object forward
+    /// </summary>
     void ThrowTrash()
     {
         isHeld = false;
 
-        // unparent and re-enable physics
+        // Unparent and re-enable physics
         transform.SetParent(null);
 
         if (rb != null)
@@ -131,15 +168,19 @@ public class TrashPickup : MonoBehaviour
             rb.isKinematic = false;
             rb.freezeRotation = false;
 
-            // reduce tunneling when thrown quickly
+            // Reduce tunneling when thrown
             rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
 
-            rb.AddForce((holdParent != null ? holdParent.forward : cam.transform.forward) * throwForce, ForceMode.Impulse);
+            rb.AddForce(
+                (holdParent != null ? holdParent.forward : cam.transform.forward) * throwForce,
+                ForceMode.Impulse
+            );
         }
     }
 }
+
 
 

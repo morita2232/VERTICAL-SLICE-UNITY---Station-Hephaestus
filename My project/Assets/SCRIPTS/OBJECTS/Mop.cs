@@ -2,42 +2,82 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// Handles picking up, holding, and using the mop:
+/// - Attaches mop to the player's hand
+/// - Toggles cleaning mode
+/// - Rotates mop based on mouse movement
+/// - Disables player movement while mopping
+/// </summary>
 public class Mop : MonoBehaviour
 {
+    // ================================
+    // Setup & Transforms
+    // ================================
+
     [Header("Setup")]
-    public Transform holdPos;     // MopHoldPos on the player (hand)
-    public Transform gripPoint;   // empty at top of handle
+
+    public Transform holdPos;      // MopHoldPos on the player (hand)
+    public Transform gripPoint;    // Empty transform at top of the handle
+
+
+    // ================================
+    // Player & Dialogue References
+    // ================================
 
     [Header("References")]
+
     public Movement playerMovement;
     public HorizontalMovement horizontalLook;
     public RotacionVertical verticalLook;
+
     public TMP_FontAsset sammyFont;
     public Sprite sammyPortrait;
 
+
+    // ================================
+    // Mop Controls
+    // ================================
+
     [Header("Mop Control")]
-    public KeyCode mopModeKey = KeyCode.Mouse1; // cleaning mode
-    public KeyCode dropKey = KeyCode.G;
-    public float rotateSpeed = 0.2f;
-    public float minPitch = -70f;
-    public float maxPitch = 70f;
+
+    public KeyCode mopModeKey = KeyCode.Mouse1; // Toggle cleaning mode
+    public KeyCode dropKey = KeyCode.G;         // Drop mop
+    public float rotateSpeed = 0.2f;            // Mouse sensitivity
+    public float minPitch = -70f;                // Minimum mop pitch
+    public float maxPitch = 70f;                 // Maximum mop pitch
+
+
+    // ================================
+    // Runtime State
+    // ================================
 
     [HideInInspector]
-    public bool holding;
+    public bool holding;                         // Whether the mop is currently held
 
-    bool isMopping = false;
+    bool isMopping = false;                      // Whether cleaning mode is active
 
-    bool prevMove;
-    bool prevLookH;
-    bool prevLookV;
+    bool prevMove;                               // Cached player movement state
+    bool prevLookH;                              // Cached horizontal look state
+    bool prevLookV;                              // Cached vertical look state
 
-    // Hand rotation while cleaning
-    Quaternion baseHandRot;
-    float mopPitch;
-    float mopYaw;
+
+    // ================================
+    // Mop Rotation State
+    // ================================
+
+    Quaternion baseHandRot;                      // Hand rotation before mopping
+    float mopPitch;                              // Current pitch
+    float mopYaw;                                // Current yaw
+
+
+    // ================================
+    // One-Time Pickup Logic
+    // ================================
 
     public static bool firstTimePickedUp = false;
     public static System.Action OnFirstPickup;
+
 
     void Update()
     {
@@ -54,30 +94,35 @@ public class Mop : MonoBehaviour
         // Toggle cleaning mode
         if (Input.GetKeyDown(mopModeKey))
         {
-            if (!isMopping) EnterMopMode();
-            else ExitMopMode();
+            if (!isMopping)
+                EnterMopMode();
+            else
+                ExitMopMode();
         }
 
+        // Rotate mop while cleaning
         if (isMopping)
             UpdateMopRotation();
     }
 
-    // Called by your interact script when pressing E near the mop
+    /// <summary>
+    /// Called by the interaction system when picking up the mop
+    /// </summary>
     public void PickUp()
     {
         holding = true;
 
-        // Parent to hand
+        // Parent to player's hand
         transform.SetParent(holdPos);
 
-        // 1) Match hand rotation
+        // Match hand rotation
         transform.rotation = holdPos.rotation;
 
-        // 2) Move mop so GripPoint is exactly at hand position
+        // Align grip point with hand position
         Vector3 worldOffset = transform.position - gripPoint.position;
         transform.position = holdPos.position + worldOffset;
-        // At this point: GripPoint.position == holdPos.position
 
+        // Play first-time pickup dialogue
         if (!firstTimePickedUp)
         {
             firstTimePickedUp = true;
@@ -89,17 +134,21 @@ public class Mop : MonoBehaviour
                     "CONGRATS!!! You did it! I always knew you could.",
                     "To activate cleaning mode press RIGHT CLICK and move your MOUSE around.",
                     "Also if you want to leave the mop press G to drop it anywhere you like."
-                }, sammyFont, sammyPortrait
+                },
+                sammyFont,
+                sammyPortrait
             );
-
         }
 
-        // Initialize pitch/yaw relative to current hand rotation
+        // Initialize rotation state
         baseHandRot = holdPos.localRotation;
         mopPitch = 0f;
         mopYaw = 0f;
     }
 
+    /// <summary>
+    /// Drops the mop back into the world
+    /// </summary>
     public void Drop()
     {
         holding = false;
@@ -113,6 +162,9 @@ public class Mop : MonoBehaviour
         );
     }
 
+    /// <summary>
+    /// Enters cleaning mode and locks player controls
+    /// </summary>
     void EnterMopMode()
     {
         if (isMopping) return;
@@ -124,23 +176,28 @@ public class Mop : MonoBehaviour
             prevMove = playerMovement.canMove;
             playerMovement.canMove = false;
         }
+
         if (horizontalLook != null)
         {
             prevLookH = horizontalLook.canMove;
             horizontalLook.canMove = false;
         }
+
         if (verticalLook != null)
         {
             prevLookV = verticalLook.canRotate;
             verticalLook.canRotate = false;
         }
 
-        // Save the hand's current local rotation (0,90,0 from your screenshot)
+        // Cache hand rotation
         baseHandRot = holdPos.localRotation;
         mopPitch = 0f;
         mopYaw = 0f;
     }
 
+    /// <summary>
+    /// Exits cleaning mode and restores player controls
+    /// </summary>
     void ExitMopMode()
     {
         if (!isMopping) return;
@@ -149,15 +206,20 @@ public class Mop : MonoBehaviour
         // Restore controls
         if (playerMovement != null)
             playerMovement.canMove = prevMove;
+
         if (horizontalLook != null)
             horizontalLook.canMove = prevLookH;
+
         if (verticalLook != null)
             verticalLook.canRotate = prevLookV;
 
-        // Restore original hand rotation (so your MopHoldPos values stay)
+        // Restore original hand rotation
         holdPos.localRotation = baseHandRot;
     }
 
+    /// <summary>
+    /// Updates mop rotation based on mouse movement
+    /// </summary>
     void UpdateMopRotation()
     {
         if (Mouse.current == null) return;
@@ -168,12 +230,12 @@ public class Mop : MonoBehaviour
         mopPitch -= delta.y * rotateSpeed;
         mopPitch = Mathf.Clamp(mopPitch, minPitch, maxPitch);
 
-        // Rotate around the hand pivot (MopHoldPos)
-        holdPos.localRotation = baseHandRot * Quaternion.Euler(mopPitch, mopYaw, 0f);
-        // Because the mop is a child and we aligned GripPoint to the hand,
-        // the visible pivot is now the top of the handle, not the sponge.
+        // Rotate around the hand pivot
+        holdPos.localRotation =
+            baseHandRot * Quaternion.Euler(mopPitch, mopYaw, 0f);
     }
 }
+
 
 
 

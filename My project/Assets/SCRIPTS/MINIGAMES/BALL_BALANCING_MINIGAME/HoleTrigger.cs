@@ -1,15 +1,30 @@
 using UnityEngine;
 
+/// <summary>
+/// Detects when the ball enters a hole
+/// and informs the BallBalancingManager which hole was hit.
+/// </summary>
 public class HoleTrigger : MonoBehaviour
 {
-    public int holeIndex;                          // set this in the Inspector (0,1,2,...)
-    public BallBalancingManager manager;           // drag the manager here
+    // ================================
+    // Hole Configuration
+    // ================================
 
+    [Header("Hole Settings")]
+
+    public int holeIndex;                // Unique index for this hole (0, 1, 2, ...)
+    public BallBalancingManager manager; // Reference to the minigame manager
+
+
+    /// <summary>
+    /// Triggered when an object enters the hole trigger
+    /// </summary>
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Ball"))             // tag your ball prefab as "Ball"
+        if (other.CompareTag("Ball")) // Ball prefab must be tagged "Ball"
         {
             manager.OnBallEnteredHole(holeIndex, other.gameObject);
         }
     }
 }
+

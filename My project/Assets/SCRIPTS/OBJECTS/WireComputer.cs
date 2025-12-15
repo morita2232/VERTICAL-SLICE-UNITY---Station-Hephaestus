@@ -1,29 +1,61 @@
 using UnityEngine;
 
+/// <summary>
+/// Represents a computer that hosts a wire-connection minigame.
+/// Handles interaction, ambient broken sounds, completion feedback,
+/// and communicates with the WireMGManager.
+/// </summary>
 public class WireComputer : MonoBehaviour
 {
-    [Header("Script references")]
-    public WireMGManager wireManager; 
-        
-    [Header("Object attributes")]
-    public bool completed;
-    public ParticleSystem activeParticles;
-    public AudioSource sfxSource;
-    public AudioClip completionSfx;
-    public AudioClip brokenSfx;
+    // ================================
+    // Script References
+    // ================================
+
+    [Header("Script References")]
+
+    public WireMGManager wireManager;   // Wire minigame manager
+
+
+    // ================================
+    // Object State & Feedback
+    // ================================
+
+    [Header("Object Attributes")]
+
+    public bool completed;              // Whether this computer has been fixed
+    public ParticleSystem activeParticles; // Visual indicator while broken
+    public AudioSource sfxSource;        // Audio source for ambient & completion sounds
+    public AudioClip completionSfx;      // Played once when fixed
+    public AudioClip brokenSfx;          // Looping sound while broken
+
+
+    // ================================
+    // Distance-Based Audio Settings
+    // ================================
 
     [Header("Distance Settings")]
-    public float hearRange = 5f;      // distance at which broken SFX starts
-    private Transform player;         // reference to player
-    private bool isBrokenSoundPlaying = false;
+
+    public float hearRange = 5f;         // Distance at which broken SFX can be heard
+
+
+    // ================================
+    // Internal State
+    // ================================
+
+    private Transform player;            // Cached player transform
+    private bool isBrokenSoundPlaying = false; // Tracks ambient sound state
+
+
     void Start()
     {
+        // Cache player reference
         player = GameObject.FindGameObjectWithTag("Player").transform;
 
+        // Play visual feedback if not completed
         if (!completed && activeParticles != null)
             activeParticles.Play();
 
-        // DO NOT play the sound here anymore, wait for Update()
+        // Prepare audio source (do not auto-play)
         if (sfxSource != null)
         {
             sfxSource.loop = true;
@@ -33,6 +65,7 @@ public class WireComputer : MonoBehaviour
 
     void Update()
     {
+        // Skip if already completed or audio is not set up
         if (completed || sfxSource == null || brokenSfx == null)
             return;
 
@@ -40,7 +73,7 @@ public class WireComputer : MonoBehaviour
 
         if (distance <= hearRange)
         {
-            // Player is close enough to hear
+            // Player is close enough to hear broken sound
             if (!isBrokenSoundPlaying)
             {
                 sfxSource.clip = brokenSfx;
@@ -50,7 +83,7 @@ public class WireComputer : MonoBehaviour
         }
         else
         {
-            // Player is too far away
+            // Player moved out of range
             if (isBrokenSoundPlaying)
             {
                 sfxSource.Stop();
@@ -59,7 +92,9 @@ public class WireComputer : MonoBehaviour
         }
     }
 
-    // called when player presses E on this computer
+    /// <summary>
+    /// Called when the player interacts with this computer
+    /// </summary>
     public void Interact()
     {
         if (completed)
@@ -71,24 +106,30 @@ public class WireComputer : MonoBehaviour
         wireManager.OpenForComputer(this);
     }
 
+    /// <summary>
+    /// Marks this computer as repaired
+    /// </summary>
     public void MarkCompleted()
     {
         completed = true;
+
         Debug.Log(name + ": puzzle completed!");
+
+        // Stop visual effects
         if (activeParticles != null)
             activeParticles.Stop();
 
-
-        // Stop broken sounds immediately
+        // Stop broken ambient sound immediately
         if (sfxSource != null)
         {
             sfxSource.Stop();
             isBrokenSoundPlaying = false;
         }
 
-        // Play completion SFX once
+        // Play completion sound once
         if (sfxSource != null && completionSfx != null)
             sfxSource.PlayOneShot(completionSfx);
     }
 }
+
 

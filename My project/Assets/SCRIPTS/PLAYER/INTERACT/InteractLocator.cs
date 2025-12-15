@@ -1,26 +1,39 @@
-using NUnit.Framework;
-using System.ComponentModel;
-using System.Threading;
-using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
-using UnityEngine.Rendering.VirtualTexturing;
+using TMPro;
 
+/// <summary>
+/// Central interaction handler.
+/// Casts a ray from the camera, determines what the player is looking at,
+/// and routes interaction input to the correct system (minigames, mop,
+/// spaceship, alien dialogue, etc.).
+/// </summary>
 public class InteractLocator : MonoBehaviour
 {
+    // ================================
+    // Interaction State
+    // ================================
+
     [Header("Attributes")]
-    public LayerMask interactMask;
-    public bool isInminigame = false;
-    public bool canInteract = false;
-    public bool isInSpaceShip = false;
-    private bool oneTime = false;
+
+    public LayerMask interactMask;     // What layers can be interacted with
+    public bool isInminigame = false;  // True while any minigame is active
+    public bool canInteract = false;   // Used by UI popups
+    public bool isInSpaceShip = false; // True when player is inside spaceship
+
+    private bool oneTime = false;      // Used for one-time spaceship dialogue
+
+
+    // ================================
+    // Scene References
+    // ================================
 
     [Header("References")]
+
     public GameObject miniGame;
     public GameObject player;
     public GameObject sSammy;
     public Transform spaceshipSpawn;
+
     public TMP_FontAsset sammyFont;
     public Sprite sammyPortrait;
 
@@ -28,58 +41,53 @@ public class InteractLocator : MonoBehaviour
     public GameObject ballBalanceObject;
     public GameObject wireComputerObject;
 
+
+    // ================================
+    // Internal State
+    // ================================
+
     private Camera mainCamera;
-    private InputSystem_Actions inputs;
-    private bool clicked;
-    public bool isTutorial = false;
+    private bool clicked;              // Interaction input (E key)
+    public bool isTutorial = false;    // Tutorial mode flag
+
 
     void Start()
     {
         mainCamera = Camera.main;
-        //inputs = new InputSystem_Actions();
-        //inputs.Enable();
     }
-
-
-    //void OnDisable()
-    //{
-    //    if (inputs != null)
-    //        inputs.Disable();
-    //}
 
     void Update()
     {
-
-        //clicked = inputs.Player.Interact.ReadValue<float>() > 0;
+        // Read interaction input
         clicked = Input.GetKeyDown(KeyCode.E);
 
         Debug.Log($"InteractLocator Update() | clicked: {clicked}");
 
+        // Raycast from center of the screen
         Ray ray = mainCamera.ScreenPointToRay(
             new Vector3(Screen.width / 2, Screen.height / 2, 0));
-        RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, 2f, interactMask))
+        if (Physics.Raycast(ray, out RaycastHit hit, 2f, interactMask))
         {
             canInteract = true;
-   
 
             bool isMinigameObject = hit.collider.CompareTag("Miniggame");
             bool isSpaceShipObject = hit.collider.CompareTag("SpaceShip");
             bool isMopObject = hit.collider.CompareTag("Mop");
             bool isAlien = hit.collider.CompareTag("Alien");
 
-            // Only DO things when the interact button is actually pressed
+            // Only act when interaction key is pressed
             if (clicked)
             {
-                // ---- MINIGAME ----
+                // ================================
+                // MINIGAME OBJECTS
+                // ================================
+
                 if (isMinigameObject)
                 {
                     var wireComp = hit.collider.GetComponent<WireComputer>();
                     var balanceComp = hit.collider.GetComponent<BallBalanceObject>();
                     var conduitComp = hit.collider.GetComponent<ConduitObject>();
-
-
                     var cleanable = hit.collider.GetComponent<CleanableSurface>();
 
                     Debug.Log(
@@ -88,60 +96,71 @@ public class InteractLocator : MonoBehaviour
                         $"| IsClean:{(cleanable ? cleanable.IsClean : false)}"
                     );
 
+                    // Block interaction if surface is dirty
                     if (cleanable != null && !cleanable.IsClean)
                     {
                         DialogueManager.Instance.SayLines(
-                           "Spammy Sammy",
-                           new string[]
-                           {
+                            "Spammy Sammy",
+                            new string[]
+                            {
                                 "Uhm, I may need to give you a cerebral inspection clearly this machine is dirty!"
-                           }, sammyFont, sammyPortrait
+                            },
+                            sammyFont,
+                            sammyPortrait
                         );
                         return;
                     }
 
-                   else if (wireComp != null)
-                   {
-                        if (isTutorial)
-                        {
-                            DialogueManager.Instance.SayLines(
-                               "Spammy Sammy",
-                               new string[]
-                               {
-                                "To fix this machine you will have to reconnect each power source to its appropriate connector",
-                                 "With your MOUSE, CLICK and DRAG the power sources from the LEFT to the connectors in the RIGHT"},
-                                 sammyFont, sammyPortrait
-                               );
-                        }
-                        wireComp.Interact();   // this calls WireMGManager.OpenForComputer(...)
-                        wireComp = null;
-                    }
-
-                   else if(balanceComp != null)
+                    // ---- WIRE COMPUTER ----
+                    else if (wireComp != null)
                     {
                         if (isTutorial)
                         {
                             DialogueManager.Instance.SayLines(
-                               "Spammy Sammy",
-                               new string[]
-                               {
-                                "To fix this machine you will have to recalibrate the balance mechanism",
-                                 "Use W/A/S/D to balance the ball and guide it to the RED hole"},
-                                 sammyFont, sammyPortrait
-                               );
-
+                                "Spammy Sammy",
+                                new string[]
+                                {
+                                    "To fix this machine you will have to reconnect each power source to its appropriate connector",
+                                    "With your MOUSE, CLICK and DRAG the power sources from the LEFT to the connectors in the RIGHT"
+                                },
+                                sammyFont,
+                                sammyPortrait
+                            );
                         }
+
+                        wireComp.Interact();
+                        wireComp = null;
+                    }
+
+                    // ---- BALL BALANCE ----
+                    else if (balanceComp != null)
+                    {
+                        if (isTutorial)
+                        {
+                            DialogueManager.Instance.SayLines(
+                                "Spammy Sammy",
+                                new string[]
+                                {
+                                    "To fix this machine you will have to recalibrate the balance mechanism",
+                                    "Use W/A/S/D to balance the ball and guide it to the RED hole"
+                                },
+                                sammyFont,
+                                sammyPortrait
+                            );
+                        }
+
                         balanceComp.Interact();
                         balanceComp = null;
                     }
+
+                    // ---- CONDUIT ----
                     else if (conduitComp != null)
                     {
                         if (isTutorial)
                         {
-                            // 1. Disable interaction until Sammy finishes talking
+                            // Delay start until dialogue finishes
                             DialogueManager.OnDialogueSequenceFinished += StartConduitAfterDialogue;
 
-                            // 2. Sammy explains how the minigame works
                             DialogueManager.Instance.SayLines(
                                 "Spammy Sammy",
                                 new string[]
@@ -150,52 +169,56 @@ public class InteractLocator : MonoBehaviour
                                     "Use your W to change to the next conduit, S to change to the previous conduit.",
                                     "Balance their energy until they reach the red bars at the same time."
                                 },
-                                sammyFont, sammyPortrait
+                                sammyFont,
+                                sammyPortrait
                             );
-
                         }
                         else
                         {
-
-                        conduitComp.Interact();
+                            conduitComp.Interact();
                             conduitComp = null;
                         }
-
-                        
                     }
-
                 }
 
-                // ---- SPACESHIP ----
+                // ================================
+                // SPACESHIP
+                // ================================
+
                 if (isSpaceShipObject)
                 {
                     if (!oneTime)
                     {
-                        // 1. Disable interaction until Sammy finishes talking
                         DialogueManager.OnDialogueSequenceFinished += EnterSpaceShip;
 
-                        // 2. Sammy explains how the minigame works
                         DialogueManager.Instance.SayLines(
-                        "Spammy Sammy",
-                        new string[]
-                        {
-                            "Attention. Prior to entry, be aware that a classified alien entity has been detected inside.",
-                            "Company threat assessment rates the subject as high-risk. ",
-                            "Engage with caution and follow all safety procedures.",
-                            "For safety reasons I must remain outside, but do not worry employee, I will be looking at the cameras :)",
-                            "(Also do not forget you can come out the spaceship pressing your R KEY)"
+                            "Spammy Sammy",
+                            new string[]
+                            {
+                                "Attention. Prior to entry, be aware that a classified alien entity has been detected inside.",
+                                "Company threat assessment rates the subject as high-risk.",
+                                "Engage with caution and follow all safety procedures.",
+                                "For safety reasons I must remain outside, but do not worry employee, I will be looking at the cameras :)",
+                                "(Also do not forget you can come out the spaceship pressing your R KEY)"
                             },
-                        sammyFont, sammyPortrait
+                            sammyFont,
+                            sammyPortrait
                         );
+
                         oneTime = true;
                     }
-                   
-                    else { 
+                    else
+                    {
                         Debug.Log("Entering spaceship...");
                         player.transform.position = spaceshipSpawn.position;
                         isInSpaceShip = true;
-                    } 
+                    }
                 }
+
+                // ================================
+                // MOP PICKUP
+                // ================================
+
                 if (isMopObject)
                 {
                     var mopComp = hit.collider.GetComponent<Mop>();
@@ -203,6 +226,11 @@ public class InteractLocator : MonoBehaviour
                     mopComp = null;
                     Debug.Log("A limpiar guarrilla");
                 }
+
+                // ================================
+                // ALIEN INTERACTION
+                // ================================
+
                 if (isAlien)
                 {
                     var alienComp = hit.collider.GetComponent<AlienInteraction>();
@@ -218,13 +246,16 @@ public class InteractLocator : MonoBehaviour
             Debug.Log("Raycast hit nothing in interactMask");
         }
     }
+
+    // ================================
+    // Dialogue Callbacks
+    // ================================
+
     void StartConduitAfterDialogue()
     {
-        // Always unsubscribe so it doesn't trigger again
         DialogueManager.OnDialogueSequenceFinished -= StartConduitAfterDialogue;
 
-        // Start the conduit minigame AFTER Sammy finishes talking
-        var ray = mainCamera.ScreenPointToRay(
+        Ray ray = mainCamera.ScreenPointToRay(
             new Vector3(Screen.width / 2, Screen.height / 2, 0));
 
         if (Physics.Raycast(ray, out RaycastHit hit, 2f, interactMask))
@@ -240,10 +271,8 @@ public class InteractLocator : MonoBehaviour
 
     void EnterSpaceShip()
     {
-        // Always unsubscribe so it only fires once
         DialogueManager.OnDialogueSequenceFinished -= EnterSpaceShip;
 
-        // Optional safety: check references
         if (player == null || spaceshipSpawn == null)
         {
             Debug.LogWarning("EnterSpaceShip: player or spaceshipSpawn is null");
@@ -255,6 +284,9 @@ public class InteractLocator : MonoBehaviour
         isInSpaceShip = true;
     }
 
+    // ================================
+    // Debug Gizmos
+    // ================================
 
     private void OnDrawGizmos()
     {
@@ -262,10 +294,13 @@ public class InteractLocator : MonoBehaviour
             mainCamera = Camera.main;
 
         Gizmos.color = Color.red;
+
         Ray ray = mainCamera.ScreenPointToRay(
             new Vector3(Screen.width / 2, Screen.height / 2, 0));
+
         Gizmos.DrawRay(ray.origin, ray.direction * 5f);
     }
 }
+
 
 

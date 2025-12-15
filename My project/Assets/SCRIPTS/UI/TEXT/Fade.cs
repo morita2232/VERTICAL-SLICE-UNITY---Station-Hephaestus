@@ -4,43 +4,88 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Handles dialogue text display with a typewriter effect.
+/// Supports speaker name, portrait, font overrides, and
+/// user-driven dismissal after text finishes typing.
+/// </summary>
 public class Fade : MonoBehaviour
 {
+    // ================================
+    // Typing Settings
+    // ================================
+
     [Header("Typing")]
-    public float delayPerCharacter = 0.05f;
+
+    public float delayPerCharacter = 0.05f;   // Speed of typewriter effect
+
+
+    // ================================
+    // UI References
+    // ================================
 
     [Header("UI References")]
-    public TextMeshProUGUI speakerText;   // name (Spammy Sammy)
-    public TextMeshProUGUI textMesh;      // dialogue text
-    public Image portraitImage;           // optional
-    public GameObject dialoguePanel;      // entire panel (for hiding/showing)
-    public GameObject continueIcon;      // optional "press to continue" icon
+
+    public TextMeshProUGUI speakerText;        // Speaker name (e.g. Spammy Sammy)
+    public TextMeshProUGUI textMesh;           // Dialogue body text
+    public Image portraitImage;                // Optional portrait image
+    public GameObject dialoguePanel;            // Entire dialogue UI panel
+    public GameObject continueIcon;             // Optional "press to continue" indicator
+
+
+    // ================================
+    // Font Settings
+    // ================================
 
     [Header("Fonts")]
-    public TMP_FontAsset defaultFont;     // font applied to BOTH name + text
 
-    private Coroutine typingRoutine;
-    private bool waitingForDismiss;
+    public TMP_FontAsset defaultFont;           // Font applied to both speaker and text
 
-    public bool IsFinished { get; private set; }
 
-    /// <summary> Fired when the last character of the current line appears. </summary>
+    // ================================
+    // Internal State
+    // ================================
+
+    private Coroutine typingRoutine;            // Active typing coroutine
+    private bool waitingForDismiss;             // Waiting for player input
+
+
+    // ================================
+    // Public State
+    // ================================
+
+    public bool IsFinished { get; private set; } // True when line finished typing
+
+
+    // ================================
+    // Events
+    // ================================
+
+    /// <summary>
+    /// Fired when the last character of the current line appears.
+    /// </summary>
     public event Action OnFinished;
 
-    /// <summary> Fired when player clicks/presses a key AFTER a line is finished. </summary>
+    /// <summary>
+    /// Fired when the player clicks or presses a key after typing finishes.
+    /// </summary>
     public event Action OnDismissed;
+
 
     void Awake()
     {
+        // Default dialogue panel to this GameObject if none assigned
         if (dialoguePanel == null)
             dialoguePanel = gameObject;
 
+        // Prepare text mesh for character revealing
         if (textMesh != null)
         {
             textMesh.ForceMeshUpdate();
             textMesh.maxVisibleCharacters = 0;
         }
 
+        // Apply default font to speaker and dialogue text
         if (defaultFont != null)
         {
             if (speakerText != null) speakerText.font = defaultFont;
@@ -50,19 +95,19 @@ public class Fade : MonoBehaviour
 
     void Update()
     {
-        // After finishing typing, wait for any key / click to advance
+        // After typing finishes, wait for any input to continue
         if (IsFinished && waitingForDismiss)
         {
             if (Input.anyKeyDown || Input.GetMouseButtonDown(0))
             {
                 waitingForDismiss = false;
-                OnDismissed?.Invoke();   // tell listener: "player wants to continue"
+                OnDismissed?.Invoke();   // Notify listeners to advance dialogue
             }
         }
     }
 
     /// <summary>
-    /// Show text, set speaker and optional portrait.
+    /// Displays dialogue text with optional speaker name, font override, and portrait.
     /// </summary>
     public void ShowText(
         string speakerName,
@@ -70,9 +115,11 @@ public class Fade : MonoBehaviour
         TMP_FontAsset overrideFont = null,
         Sprite portrait = null)
     {
-        continueIcon.SetActive(false);
+        if (continueIcon != null)
+            continueIcon.SetActive(false);
+
         if (dialoguePanel != null)
-            dialoguePanel.SetActive(true);   // make sure the box is visible
+            dialoguePanel.SetActive(true);
 
         if (typingRoutine != null)
             StopCoroutine(typingRoutine);
@@ -80,7 +127,7 @@ public class Fade : MonoBehaviour
         waitingForDismiss = false;
         IsFinished = false;
 
-        // Decide which font to use
+        // Choose which font to use
         TMP_FontAsset useFont = overrideFont != null ? overrideFont : defaultFont;
 
         if (speakerText != null)
@@ -117,9 +164,12 @@ public class Fade : MonoBehaviour
 
         typingRoutine = null;
         IsFinished = true;
-        continueIcon.SetActive(true);
-        waitingForDismiss = true;   // now wait for click/key
-        OnFinished?.Invoke();       // finished typing this line
+
+        if (continueIcon != null)
+            continueIcon.SetActive(true);
+
+        waitingForDismiss = true;
+        OnFinished?.Invoke();   // Notify listeners that typing is complete
     }
 }
 
