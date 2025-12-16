@@ -17,7 +17,7 @@ public class Fade : MonoBehaviour
 
     [Header("Typing")]
 
-    public float delayPerCharacter = 0.05f;   // Speed of typewriter effect
+    public float delayPerCharacter = 0.0005f;   // Speed of typewriter effect
 
 
     // ================================

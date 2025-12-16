@@ -103,7 +103,7 @@ public class InteractLocator : MonoBehaviour
                             "Spammy Sammy",
                             new string[]
                             {
-                                "Uhm, I may need to give you a cerebral inspection clearly this machine is dirty!"
+                                "Uhm, I may need to give you a cerebral inspection clearly this machine is <color=red><u><b>dirty</b></u></color>!"
                             },
                             sammyFont,
                             sammyPortrait
@@ -121,7 +121,7 @@ public class InteractLocator : MonoBehaviour
                                 new string[]
                                 {
                                     "To fix this machine you will have to reconnect each power source to its appropriate connector",
-                                    "With your MOUSE, CLICK and DRAG the power sources from the LEFT to the connectors in the RIGHT"
+                                    "With your <color=red><u><b>MOUSE, CLICK and DRAG</b></u></color> the power sources from the <color=red><u><b>LEFT</b></u></color> to the connectors in the <color=red><u><b>RIGHT</b></u></color>"
                                 },
                                 sammyFont,
                                 sammyPortrait
@@ -142,7 +142,7 @@ public class InteractLocator : MonoBehaviour
                                 new string[]
                                 {
                                     "To fix this machine you will have to recalibrate the balance mechanism",
-                                    "Use W/A/S/D to balance the ball and guide it to the RED hole"
+                                    "Use <color=red><u><b>W/A/S/D</b></u></color> to balance the ball and guide it to the <color=red><u><b>RED hole<color=red><u><b>"
                                 },
                                 sammyFont,
                                 sammyPortrait
@@ -166,8 +166,8 @@ public class InteractLocator : MonoBehaviour
                                 new string[]
                                 {
                                     "To fix this machine you will have to restore the energy from the systems.",
-                                    "Use your W to change to the next conduit, S to change to the previous conduit.",
-                                    "Balance their energy until they reach the red bars at the same time."
+                                    "Use your <color=red><u><b>W</b></u></color> to change to the <color=red><u><b>next</b></u></color> conduit, <color=red><u><b>S</b></u></color> to change to the <color=red><u><b>previous</b></u></color> conduit.",
+                                    "<color=red><u><b>Balance</b></u></color> their energy until they reach the <color=red><u><b>red bars at the same time</b></u></color>."
                                 },
                                 sammyFont,
                                 sammyPortrait
@@ -195,8 +195,8 @@ public class InteractLocator : MonoBehaviour
                             "Spammy Sammy",
                             new string[]
                             {
-                                "Attention. Prior to entry, be aware that a classified alien entity has been detected inside.",
-                                "Company threat assessment rates the subject as high-risk.",
+                                "Attention. Prior to entry, be aware that a <color=red><u><b>classified alien entity</b></u></color> has been detected inside.",
+                                "Company threat assessment rates the subject as <color=red><u><b>high-risk</b></u></color>.",
                                 "Engage with caution and follow all safety procedures.",
                                 "For safety reasons I must remain outside, but do not worry employee, I will be looking at the cameras :)",
                                 "(Also do not forget you can come out the spaceship pressing your R KEY)"

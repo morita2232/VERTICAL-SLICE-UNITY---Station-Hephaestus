@@ -60,7 +60,7 @@ public class IntroDialogue : MonoBehaviour
                 new string[]
                 {
                     "Heya pal!! Welcome to your FIRST DAY at Station Hephaestus!",
-                    "I’m Spammy Sammy! I smile so you don’t have to!",
+                    "I’m <color=red><u><b>Spammy Sammy</b></u></color>! I smile so you don’t have to!",
                     "If we clean fast enough, we might even earn an extra five seconds of break time! We can DREAM!",
                     "Now grab that mop and start cleaning these machines so we can fix them!!!"
                 },

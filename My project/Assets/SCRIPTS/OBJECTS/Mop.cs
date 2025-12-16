@@ -132,8 +132,8 @@ public class Mop : MonoBehaviour
                 new string[]
                 {
                     "CONGRATS!!! You did it! I always knew you could.",
-                    "To activate cleaning mode press RIGHT CLICK and move your MOUSE around.",
-                    "Also if you want to leave the mop press G to drop it anywhere you like."
+                    "To activate cleaning mode press <color=red><u><b>RIGHT CLICK</b></u></color> and move your <color=red><u><b>MOUSE around</b></u></color>.",
+                    "Also if you want to leave the mop <color=red><u><b>press G to drop it</b></u></color> anywhere you like."
                 },
                 sammyFont,
                 sammyPortrait
