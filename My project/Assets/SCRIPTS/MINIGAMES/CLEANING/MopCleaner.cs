@@ -51,33 +51,9 @@ public class MopCleaner : MonoBehaviour
         if (currentSpeed < minMoveSpeed)
             return;
 
-        // ================================
-        // 1) Shrink & Remove Dirt Objects
-        // ================================
-
-        if (other.CompareTag("Dirt"))
-        {
-            Transform dirt = other.transform;
-            Vector3 scale = dirt.localScale;
-
-            float shrinkAmount = shrinkRate * Time.deltaTime;
-            scale -= Vector3.one * shrinkAmount;
-
-            float maxAxis = Mathf.Max(scale.x, Mathf.Max(scale.y, scale.z));
-            if (maxAxis <= minScaleToDestroy)
-            {
-                checklist.allDirt--;
-                checklist.remaining--;
-                Destroy(dirt.gameObject);
-                return;
-            }
-
-            dirt.localScale = scale;
-            return;
-        }
 
         // ================================
-        // 2) Clean Shader-Based Surfaces
+        // Clean Shader-Based Surfaces
         // ================================
 
         CleanableSurface surface = other.GetComponent<CleanableSurface>();

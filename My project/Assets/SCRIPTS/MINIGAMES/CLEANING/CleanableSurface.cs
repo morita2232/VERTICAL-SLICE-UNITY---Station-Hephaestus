@@ -73,7 +73,7 @@ public class CleanableSurface : MonoBehaviour
         value = Mathf.Clamp(value + amount, 0f, maxValue);
         ApplyToMaterial();
 
-        if (!isClean && value >= maxValue - 0.0001f)
+        if (!isClean && value >= maxValue - 0.1f)
         {
             isClean = true;
 
