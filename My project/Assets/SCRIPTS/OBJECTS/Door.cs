@@ -14,7 +14,7 @@ public class Door : MonoBehaviour
 
     public WireComputer wireComputer;          // Opens door when wire puzzle is completed
     public BallBalanceObject ballBalanceObject; // Opens door when ball puzzle is completed
-
+    public ConduitObject conduitObject;      // Opens door when conduit puzzle is completed
 
     // ================================
     // Door Setup
@@ -63,6 +63,10 @@ public class Door : MonoBehaviour
 
         // Ball balance puzzle trigger
         if (ballBalanceObject != null && ballBalanceObject.completed)
+            return true;
+
+        // Conduit puzzle trigger
+        if (conduitObject != null && conduitObject.completed)
             return true;
 
         return false;
